@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Lock } from "lucide-react";
 import { triggerVibration } from "../lib/utils";
+import coolYellowAnonymous from "../assets/images/cool_yellow_anonymous_1786018183746.jpg";
 import splashImage from "../assets/images/user_provided_splash.jpg";
 
 interface LoginViewProps {
@@ -45,8 +46,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
   setPasscode,
   passcodeError,
   setPasscodeError,
+  jarvisBg,
 }) => {
   const [showKeypad, setShowKeypad] = useState(false);
+  const [bgSrc, setBgSrc] = useState(coolYellowAnonymous || splashImage || jarvisBg);
 
   // Auto-reveal floating PIN keypad after image splash effect duration (1.8s)
   useEffect(() => {
@@ -107,30 +110,31 @@ export const LoginView: React.FC<LoginViewProps> = ({
         onClick={() => !showKeypad && setShowKeypad(true)}
         className="w-full min-h-screen min-h-[100dvh] max-w-lg mx-auto bg-slate-950 flex flex-col items-center justify-between p-4 sm:p-6 relative overflow-hidden cursor-pointer"
       >
-        {/* --- FULL SCREEN BACKGROUND IMAGE WITH SMOOTH FADE & DIM --- */}
+        {/* --- FULL SCREEN BACKGROUND IMAGE WITH CLEAR VISIBILITY & SMOOTH FADE --- */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <motion.img
-            src={splashImage}
+            src={bgSrc}
             alt="Splash Screen"
             referrerPolicy="no-referrer"
-            onError={(e) => {
-              // Hide broken image icon if image fails to load
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            onError={() => {
+              if (bgSrc !== jarvisBg) {
+                setBgSrc(jarvisBg);
+              }
             }}
             initial={{ scale: 1.08, filter: "brightness(1.0)" }}
             animate={{ 
               scale: showKeypad ? 1.02 : 1.0,
-              filter: showKeypad ? "brightness(0.42) contrast(1.08) blur(1px)" : "brightness(1.0)" 
+              filter: showKeypad ? "brightness(0.82) contrast(1.05)" : "brightness(1.0)" 
             }}
             transition={{ duration: 1.2, ease: smoothEase }}
             className="w-full h-full object-cover object-center"
           />
 
-          {/* Smooth Dark Vignette Overlay */}
+          {/* Smooth Subtle Vignette Overlay */}
           <motion.div 
-            animate={{ opacity: showKeypad ? 0.65 : 0.15 }}
+            animate={{ opacity: showKeypad ? 0.35 : 0.15 }}
             transition={{ duration: 1.2, ease: smoothEase }}
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-slate-950/60" 
+            className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-slate-950/40" 
           />
         </div>
 
@@ -141,18 +145,18 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <AnimatePresence mode="wait">
           {showKeypad && (
             <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.7, ease: smoothEase }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: smoothEase }}
               className="w-full max-w-xs flex flex-col items-center relative z-20 my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header Text & Icon */}
               <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: smoothEase }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, ease: smoothEase }}
                 className="mb-4 flex flex-col items-center gap-2"
               >
                 <div className="w-12 h-12 rounded-full bg-slate-900/60 border border-slate-500/40 backdrop-blur-md flex items-center justify-center shadow-xl">

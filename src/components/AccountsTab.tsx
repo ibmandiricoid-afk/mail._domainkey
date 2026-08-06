@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Info, Loader2, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
   Compass, Lock, Cloud, LogOut, Key, Bot, FileSignature, Eye, Code, ChevronDown, ChevronUp,
-  TrendingUp, Link, Globe, Activity
+  TrendingUp, Link, Globe, Activity, Flame, RotateCcw, Calendar, Sliders
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SmtpConfig } from "../types";
@@ -201,6 +201,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
   const [testFailed, setTestFailed] = useState(false);
   const [showMicrosoftSettingsModal, setShowMicrosoftSettingsModal] = useState(false);
   const [isSignatureExpanded, setIsSignatureExpanded] = useState(false);
+  const [isWarmupConfigExpanded, setIsWarmupConfigExpanded] = useState(false);
 
   // Domain & IP Reputation Audit Modal States
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -841,9 +842,9 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
 
       <motion.div
         key="accounts-view"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         className="px-2 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-7xl mx-auto pb-28"
       >
         <div className="space-y-4">
@@ -1158,6 +1159,368 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               </div>
             </div>
 
+          </div>
+
+          {/* --- CARD PENGATURAN WARM-UP & LIMIT EMAIL HARIAN & SPAM SCORE --- */}
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] space-y-3 transition-all">
+            {(() => {
+              const schedule = smtpConfig.warmUpSchedule || {
+                enabled: true,
+                preset: "standard",
+                currentDay: 1,
+                startLimit: 25,
+                rampStep: 25,
+                maxDailyLimit: 2000,
+                delayBetweenEmailsSec: 5,
+                sentTodayCount: 0,
+                todayDate: new Date().toISOString().split("T")[0],
+                reputationScore: 98,
+                autoPauseOnError: true
+              };
+              const todayLimit = Math.min(
+                schedule.startLimit + (schedule.currentDay - 1) * schedule.rampStep,
+                schedule.maxDailyLimit
+              );
+              const isExceeded = schedule.sentTodayCount >= todayLimit;
+
+              // Calculate Spam Warning Percentage & Reputation Score
+              const repScore = schedule.reputationScore || 98;
+              const baseSpamRisk = Math.max(1, 100 - repScore);
+              const excessOverflow = isExceeded ? Math.min(35, Math.round(((schedule.sentTodayCount - todayLimit) / todayLimit) * 25)) : 0;
+              const totalSpamRiskPct = Math.min(100, baseSpamRisk + excessOverflow);
+
+              // Status badges
+              const riskCategory = totalSpamRiskPct <= 5 ? { label: "Sangat Safe / Aman", color: "text-emerald-700 bg-emerald-100 border-emerald-300" }
+                : totalSpamRiskPct <= 18 ? { label: "Waspada Moderat", color: "text-amber-700 bg-amber-100 border-amber-300" }
+                : { label: "Risiko Spam Tinggi", color: "text-rose-700 bg-rose-100 border-rose-300" };
+
+              return (
+                <div className="space-y-3">
+                  {/* Card Header & Compact Toggle Controls */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div 
+                      onClick={() => setIsWarmupConfigExpanded(!isWarmupConfigExpanded)}
+                      className="flex items-start sm:items-center gap-3 cursor-pointer group select-none flex-1"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 shrink-0 group-hover:bg-amber-500/20 transition-all">
+                        <Flame className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
+                            Warm-Up Domain & Batas Pengiriman
+                          </h3>
+                          <span className={hn(
+                            "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border",
+                            schedule.enabled !== false 
+                              ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                              : "bg-slate-100 text-slate-600 border-slate-300"
+                          )}>
+                            {schedule.enabled !== false ? "AKTIF" : "NONAKTIF"}
+                          </span>
+                          
+                          {/* Spam Risk Pill summary when collapsed */}
+                          <span className={hn("text-[9px] font-bold px-2 py-0.5 rounded-md border", riskCategory.color)}>
+                            Risk Spam: {totalSpamRiskPct}%
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          Hari ke-{schedule.currentDay} • Limit: <strong className="text-slate-800">{todayLimit} email</strong> • Terkirim: <strong className="text-slate-800">{schedule.sentTodayCount}</strong>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* Toggle Button expand/collapse entire panel */}
+                      <button
+                        type="button"
+                        onClick={() => setIsWarmupConfigExpanded(!isWarmupConfigExpanded)}
+                        className={hn(
+                          "px-3 py-1.5 active:scale-95 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs",
+                          isWarmupConfigExpanded
+                            ? "bg-amber-500 text-slate-950 border-amber-600 shadow-xs"
+                            : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
+                        )}
+                      >
+                        <Sliders className="w-3.5 h-3.5" />
+                        <span>{isWarmupConfigExpanded ? "Sembunyikan Tampilan" : "Buka Pengaturan & Status"}</span>
+                        {isWarmupConfigExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+
+                      {/* Enable Warmup Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0 ml-1" title="Aktif/Nonaktifkan Fitur Warm-Up">
+                        <input
+                          type="checkbox"
+                          checked={schedule.enabled !== false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            setSmtpConfig(prev => ({
+                              ...prev,
+                              warmUpSchedule: {
+                                ...(prev.warmUpSchedule || schedule),
+                                enabled: isChecked
+                              }
+                            }));
+                            addLog("info", isChecked ? "🔥 Fitur Warm-Up Domain diaktifkan." : "⚡ Fitur Warm-Up Domain dinonaktifkan.");
+                          }}
+                          className="sr-only peer"
+                        />
+                        <div className="w-10 h-5.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-amber-600"></div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* COLLAPSIBLE ENTIRE WARM-UP & SPAM SCORE BODY */}
+                  <AnimatePresence>
+                    {isWarmupConfigExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden space-y-3.5 pt-3 border-t border-slate-100"
+                      >
+                        {/* 1. SPAM SCORE & REPUTATION DASHBOARD BAR */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/80">
+                          {/* Skor Persentase Peringatan Spam */}
+                          <div className="flex flex-col gap-1.5 p-2.5 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Skor Peringatan Spam
+                              </span>
+                              <span className={hn("text-[10px] font-black px-2 py-0.5 rounded-md border", riskCategory.color)}>
+                                {totalSpamRiskPct}% ({riskCategory.label})
+                              </span>
+                            </div>
+                            
+                            {/* Visual Meter Bar */}
+                            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${totalSpamRiskPct}%` }}
+                                transition={{ duration: 0.5 }}
+                                className={hn(
+                                  "h-full rounded-full transition-all",
+                                  totalSpamRiskPct <= 5 ? "bg-emerald-500" : totalSpamRiskPct <= 18 ? "bg-amber-500" : "bg-rose-500 animate-pulse"
+                                )}
+                              />
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              {totalSpamRiskPct <= 5 
+                                ? "Tingkat risiko spam sangat aman. Email Anda diproyeksikan masuk Kotak Masuk (Inbox)."
+                                : isExceeded
+                                ? "⚠️ Peringatan: Batas kuota harian terlampaui. Tingkat risiko spam naik, disarankan mereset kuota atau menaikkan hari warm-up."
+                                : "Tingkat risiko sedang. Pertahankan kecepatan pengiriman dan pastikan subjek tidak mengandung kata kunci spam."}
+                            </p>
+                          </div>
+
+                          {/* Skor Reputasi Domain */}
+                          <div className="flex flex-col gap-1.5 p-2.5 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
+                                <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Skor Reputasi Domain
+                              </span>
+                              <span className="text-[10px] font-mono font-black text-slate-900 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200">
+                                {repScore} / 100
+                              </span>
+                            </div>
+
+                            {/* Visual Meter Bar */}
+                            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${repScore}%` }}
+                                transition={{ duration: 0.5 }}
+                                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500"
+                              />
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              Reputasi server & domain pengirim terverifikasi baik. Meminimalkan rasio bouncing.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 2. Status Banner Quota Today */}
+                        <div className={hn(
+                          "p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs font-medium",
+                          isExceeded && schedule.enabled !== false
+                            ? "bg-amber-50 border-amber-300 text-amber-900 shadow-xs"
+                            : "bg-slate-50 border-slate-200/80 text-slate-800"
+                        )}>
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-slate-900">
+                                Kuota Pengiriman Hari Ini:
+                              </span>
+                              <span className={hn(
+                                "font-mono font-black px-2 py-0.5 rounded-md text-xs",
+                                isExceeded && schedule.enabled !== false 
+                                  ? "bg-rose-100 text-rose-700 border border-rose-300 animate-pulse" 
+                                  : "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              )}>
+                                {schedule.sentTodayCount} / {todayLimit} email terkirim
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-600 font-medium">
+                              {isExceeded && schedule.enabled !== false
+                                ? `⚠️ Limit Warm-up Hari ke-${schedule.currentDay} (${todayLimit} email) telah tercapai.` 
+                                : `Tersisa ${Math.max(0, todayLimit - schedule.sentTodayCount)} slot email pengiriman untuk Hari ke-${schedule.currentDay}.`}
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSmtpConfig(prev => ({
+                                ...prev,
+                                warmUpSchedule: {
+                                  ...(prev.warmUpSchedule || schedule),
+                                  sentTodayCount: 0
+                                }
+                              }));
+                              addLog("success", `🔄 Hitungan email hari ini direset kembali ke 0 / ${todayLimit}.`);
+                            }}
+                            className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-xs font-extrabold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0 border border-amber-400"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>Reset Hitungan (0)</span>
+                          </button>
+                        </div>
+
+                        {/* 3. Form Input Controls Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                          {/* Hari Warm-up (Current Day) */}
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-amber-600" /> Hari Warm-Up Saat Ini
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={30}
+                              value={schedule.currentDay}
+                              onChange={(e) => {
+                                const val = Math.max(1, parseInt(e.target.value) || 1);
+                                setSmtpConfig(prev => ({
+                                  ...prev,
+                                  warmUpSchedule: {
+                                    ...(prev.warmUpSchedule || schedule),
+                                    currentDay: val
+                                  }
+                                }));
+                              }}
+                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                            />
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              Hari 1 = {schedule.startLimit} email limit. Naikkan hari untuk mendapat limit lebih besar.
+                            </p>
+                          </div>
+
+                          {/* Limit Awal Hari Ke-1 */}
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <Sliders className="w-3.5 h-3.5 text-amber-600" /> Limit Awal (Hari 1)
+                            </label>
+                            <input
+                              type="number"
+                              min={5}
+                              max={10000}
+                              step={5}
+                              value={schedule.startLimit}
+                              onChange={(e) => {
+                                const val = Math.max(5, parseInt(e.target.value) || 25);
+                                setSmtpConfig(prev => ({
+                                  ...prev,
+                                  warmUpSchedule: {
+                                    ...(prev.warmUpSchedule || schedule),
+                                    startLimit: val
+                                  }
+                                }));
+                              }}
+                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                            />
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              Batas dasar email awal untuk Hari Ke-1.
+                            </p>
+                          </div>
+
+                          {/* Kenaikan Per Hari (Ramp Step) */}
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <TrendingUp className="w-3.5 h-3.5 text-amber-600" /> Tambahan Limit / Hari
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={5000}
+                              step={5}
+                              value={schedule.rampStep}
+                              onChange={(e) => {
+                                const val = Math.max(0, parseInt(e.target.value) || 0);
+                                setSmtpConfig(prev => ({
+                                  ...prev,
+                                  warmUpSchedule: {
+                                    ...(prev.warmUpSchedule || schedule),
+                                    rampStep: val
+                                  }
+                                }));
+                              }}
+                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                            />
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              Kenaikan kuota tiap bertambah 1 hari warm-up.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Preset Day Buttons */}
+                        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                          <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                            Pilih Cepat Hari Warm-Up:
+                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {[1, 2, 3, 5, 7, 10, 14, 30].map((dayNum) => {
+                              const calculatedLimit = schedule.startLimit + (dayNum - 1) * schedule.rampStep;
+                              const isCurrent = schedule.currentDay === dayNum;
+                              return (
+                                <button
+                                  key={dayNum}
+                                  type="button"
+                                  onClick={() => {
+                                    setSmtpConfig(prev => ({
+                                      ...prev,
+                                      warmUpSchedule: {
+                                        ...(prev.warmUpSchedule || schedule),
+                                        currentDay: dayNum
+                                      }
+                                    }));
+                                    addLog("info", `🔥 Hari Warm-Up dialihkan ke Hari ke-${dayNum} (Limit: ${calculatedLimit} email/hari).`);
+                                  }}
+                                  className={hn(
+                                    "px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer shadow-2xs flex items-center gap-1",
+                                    isCurrent
+                                      ? "bg-amber-500 text-slate-950 border-amber-600 font-black shadow-xs scale-105"
+                                      : "bg-slate-50 text-slate-700 hover:bg-amber-50 hover:text-amber-900 border-slate-200"
+                                  )}
+                                >
+                                  <span>Hari {dayNum}</span>
+                                  <span className={hn(
+                                    "text-[10px] font-mono px-1.5 py-0.2 rounded",
+                                    isCurrent ? "bg-amber-600/30 text-slate-950" : "bg-slate-200 text-slate-600"
+                                  )}>
+                                    {calculatedLimit} limit
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })()}
           </div>
 
 

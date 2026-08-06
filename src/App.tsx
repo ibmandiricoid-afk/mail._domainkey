@@ -436,15 +436,15 @@ export default function App() {
 
             {/* --- SYSTEM BACKGROUND --- */}
             <div 
-              className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-cover bg-center bg-no-repeat opacity-[0.06]"
+              className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-cover bg-center bg-no-repeat opacity-[0.08]"
               style={{ backgroundImage: `url(${jarvisBg})` }}
             />
             <div 
-              className="absolute inset-0 pointer-events-none overflow-hidden z-[1]"
+              className="absolute inset-0 pointer-events-none z-0 transition-all duration-700"
               style={{
                 background: `
-                  radial-gradient(circle at 50% 10%, rgba(0, 175, 240, 0.08) 0%, transparent 80%),
-                  linear-gradient(180deg, #e4e9f2 0%, #dbe2ee 100%)
+                  radial-gradient(circle at 50% 10%, rgba(0, 82, 145, 0.12) 0%, transparent 80%),
+                  linear-gradient(180deg, #c3d2e6 0%, #b0c2db 100%)
                 `,
               }}
             />
@@ -541,44 +541,44 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Right Area (SMTP Action button with Real-time Connection Status) */}
-              <div className="flex items-center gap-1 shrink-0 z-10">
+              {/* Right Area: Dedicated Server Status Light & SMTP Accounts Button */}
+              <div className="flex items-center gap-1.5 shrink-0 z-10">
+                {/* Status Lampu Indikator Server */}
                 <button 
-                  onClick={() => {
-                    checkBackendHealth();
-                    setActiveTab("accounts");
-                  }}
+                  onClick={checkBackendHealth}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white transition-all cursor-pointer shadow-sm group"
+                  title={isBackendConnected === true ? "Status Server Backend: ONLINE (Klik untuk periksa ulang)" : isBackendConnected === false ? "Status Server Backend: OFFLINE (Klik untuk periksa ulang)" : "Memeriksa koneksi server..."}
+                >
+                  <span className="relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                    {isBackendConnected === true ? (
+                      <>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+                      </>
+                    ) : isBackendConnected === false ? (
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500 shadow-[0_0_8px_#f43f5e]" />
+                    ) : (
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400 animate-pulse shadow-[0_0_6px_#fbbf24]" />
+                    )}
+                  </span>
+                  <span className="text-[9px] font-black tracking-wider text-white uppercase hidden sm:inline">
+                    {isBackendConnected === true ? "ONLINE" : isBackendConnected === false ? "OFFLINE" : "CHECK..."}
+                  </span>
+                </button>
+
+                {/* Tombol Pengaturan Akun SMTP */}
+                <button 
+                  onClick={() => setActiveTab("accounts")}
                   className={hn(
-                    "px-2 py-1 rounded-lg text-[9.5px] font-extrabold transition-all shadow-sm uppercase cursor-pointer flex items-center gap-1.5 border shrink-0 whitespace-nowrap",
+                    "px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all shadow-sm uppercase cursor-pointer flex items-center gap-1.5 border shrink-0 whitespace-nowrap",
                     activeTab === "accounts" 
                       ? "bg-white text-[#005291] border-white shadow-md font-black scale-105" 
                       : "bg-white/15 hover:bg-white/25 text-white border-white/25"
                   )}
-                  title={isBackendConnected === true ? "Status Server: Online" : isBackendConnected === false ? "Status Server: Offline" : "Memeriksa koneksi..."}
+                  title="Pengaturan Akun SMTP"
                 >
                   <ZohoSmtpIcon size="sm" className="w-4 h-4 shrink-0" />
-                  <span 
-                    className={hn(
-                      "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-black tracking-wider transition-all shrink-0 whitespace-nowrap uppercase",
-                      isBackendConnected === true
-                        ? "bg-emerald-500/25 text-emerald-200 border border-emerald-400/50 shadow-[0_0_8px_rgba(16,185,129,0.3)]"
-                        : isBackendConnected === false
-                        ? "bg-rose-500/25 text-rose-200 border border-rose-400/50 shadow-[0_0_8px_rgba(244,63,94,0.3)]"
-                        : "bg-amber-500/25 text-amber-200 border border-amber-400/50"
-                    )}
-                  >
-                    <span 
-                      className={hn(
-                        "w-1.5 h-1.5 rounded-full animate-pulse shrink-0",
-                        isBackendConnected === true
-                          ? "bg-emerald-400 shadow-[0_0_6px_#34d399]"
-                          : isBackendConnected === false
-                          ? "bg-rose-400 shadow-[0_0_6px_#f87171]"
-                          : "bg-amber-400 shadow-[0_0_6px_#fbbf24]"
-                      )}
-                    />
-                    <span>{isBackendConnected === true ? "ONLINE" : isBackendConnected === false ? "OFFLINE" : "CHECK"}</span>
-                  </span>
+                  <span className="hidden xs:inline">AKUN SMTP</span>
                 </button>
               </div>
             </header>
@@ -609,7 +609,7 @@ export default function App() {
                   setQuickTestTemplate={setQuickTestTemplate}
                 />
               </div>
-              <div className="flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar" style={{ display: activeTab === "terminal" ? "flex" : "none" }}>
+              <div className="flex-1 flex flex-col min-h-0 h-full overflow-hidden" style={{ display: activeTab === "terminal" ? "flex" : "none" }}>
                 <TerminalTab 
                   logs={logs}
                   setLogs={setLogs}

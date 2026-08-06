@@ -891,9 +891,9 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
 
       <motion.div
         key="send-view"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         className="px-2 sm:px-4 md:px-6 py-2 w-full max-w-7xl mx-auto flex flex-col h-full pb-2"
       >
         <div className="flex-1 flex flex-col w-full h-auto min-h-[480px]">
@@ -1033,6 +1033,88 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                             className="text-center text-[10px] font-black text-white bg-blue-600 hover:bg-blue-700 py-2 px-3 rounded-xl shadow-sm transition-all uppercase tracking-wide cursor-pointer"
                           >
                             Beralih ke Microsoft Graph (OAuth2) Sekarang
+                          </button>
+                        </div>
+                      )}
+
+                      {(errorBanner.toLowerCase().includes("batas warm-up") || errorBanner.toLowerCase().includes("warm-up")) && (
+                        <div className="mt-1 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex flex-wrap gap-2 items-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (setSmtpConfig) {
+                                setSmtpConfig(prev => {
+                                  const currentSchedule = prev.warmUpSchedule || {
+                                    enabled: true,
+                                    preset: "standard",
+                                    currentDay: 1,
+                                    startLimit: 25,
+                                    rampStep: 25,
+                                    maxDailyLimit: 2000,
+                                    delayBetweenEmailsSec: 5,
+                                    sentTodayCount: 0,
+                                    todayDate: new Date().toISOString().split("T")[0],
+                                    reputationScore: 98,
+                                    autoPauseOnError: true
+                                  };
+                                  return {
+                                    ...prev,
+                                    warmUpSchedule: {
+                                      ...currentSchedule,
+                                      currentDay: currentSchedule.currentDay + 1
+                                    }
+                                  };
+                                });
+                              }
+                              setErrorBanner(null);
+                              addLog("info", "🔥 Hari Warm-Up dinaikkan +1 Hari secara cepat.");
+                            }}
+                            className="text-[10px] font-black text-amber-950 bg-amber-400 hover:bg-amber-500 py-1.5 px-3 rounded-lg transition-all border border-amber-500 cursor-pointer shadow-2xs"
+                          >
+                            +1 Naikkan Hari Warm-Up
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (setSmtpConfig) {
+                                setSmtpConfig(prev => ({
+                                  ...prev,
+                                  warmUpSchedule: {
+                                    ...(prev.warmUpSchedule || {
+                                      enabled: true,
+                                      preset: "standard",
+                                      currentDay: 1,
+                                      startLimit: 25,
+                                      rampStep: 25,
+                                      maxDailyLimit: 2000,
+                                      delayBetweenEmailsSec: 5,
+                                      sentTodayCount: 0,
+                                      todayDate: new Date().toISOString().split("T")[0],
+                                      reputationScore: 98,
+                                      autoPauseOnError: true
+                                    }),
+                                    sentTodayCount: 0
+                                  }
+                                }));
+                              }
+                              setErrorBanner(null);
+                              addLog("success", "🔄 Kuota hari ini direset kembali ke 0.");
+                            }}
+                            className="text-[10px] font-bold text-slate-800 bg-white hover:bg-slate-100 py-1.5 px-3 rounded-lg transition-all border border-slate-300 cursor-pointer shadow-2xs"
+                          >
+                            Reset Kuota Hari Ini (0)
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setErrorBanner(null);
+                              setActiveTab("accounts");
+                            }}
+                            className="text-[10px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 py-1.5 px-3 rounded-lg transition-all cursor-pointer"
+                          >
+                            Atur Limit di Tab Akun →
                           </button>
                         </div>
                       )}

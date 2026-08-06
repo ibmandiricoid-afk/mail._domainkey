@@ -48,9 +48,9 @@ export const PasscodeModal: React.FC<PasscodeModalProps> = ({
 
           {/* Modal Box */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
             className="relative bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-md mx-auto rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-2xl z-[1000] text-slate-800 flex flex-col max-h-[88vh] sm:max-h-[85vh] overflow-hidden"
           >
             {/* Accent Line */}

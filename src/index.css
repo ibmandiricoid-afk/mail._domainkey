@@ -165,7 +165,7 @@ img, video {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Navigation and bar styling without forced white background */
+/* Navigation and bar styling */
 header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -177,29 +177,6 @@ nav {
 aside {
   background-color: rgba(255, 255, 255, 0.98) !important;
   border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-.bg-white\/\[0\.03\] {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-}
-
-.bg-white\/\[0\.05\] {
-  background-color: rgba(248, 250, 252, 0.95) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-.bg-white\/\[0\.08\] {
-  background-color: rgba(241, 245, 249, 1) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Increase opacity of overlay screens for maximum legibility and speed */
-.bg-slate-900\/70,
-.bg-slate-950\/60,
-.bg-slate-950\/40,
-.bg-black\/50 {
-  background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
 @keyframes terminal-blink {
