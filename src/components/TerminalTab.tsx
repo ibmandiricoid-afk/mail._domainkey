@@ -4,7 +4,7 @@ import {
   ChevronRight, ChevronDown, Layers
 } from "lucide-react";
 import { motion } from "motion/react";
-import { LogEntry, SmtpConfig, EmailValidationRecord } from "../types";
+import { LogEntry, SmtpConfig } from "../types";
 import { hn } from "../lib/utils";
 
 interface TerminalTabProps {
@@ -13,8 +13,6 @@ interface TerminalTabProps {
   addLog?: (type: "info" | "success" | "error" | "warning", msg: string) => void;
   smtpConfig?: SmtpConfig;
   setSmtpConfig?: React.Dispatch<React.SetStateAction<SmtpConfig>>;
-  validationRecords?: EmailValidationRecord[];
-  setValidationRecords?: React.Dispatch<React.SetStateAction<EmailValidationRecord[]>>;
 }
 
 export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({ 

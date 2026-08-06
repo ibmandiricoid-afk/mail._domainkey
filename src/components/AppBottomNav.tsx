@@ -13,7 +13,7 @@ export const AppBottomNav: React.FC<AppBottomNavProps> = ({
   setActiveTab,
 }) => {
   return (
-    <nav className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-t border-sky-400/20 h-[64px] flex items-center justify-around z-50 shadow-[0_-8px_30px_rgba(0,35,75,0.35)] px-3 safe-area-bottom overflow-visible transition-all duration-500 ease-in-out translate-y-0 opacity-100 backdrop-blur-md">
+    <nav className="shrink-0 relative w-full bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-t border-sky-400/20 h-[64px] flex items-center justify-around z-40 shadow-[0_-8px_30px_rgba(0,35,75,0.35)] px-4 overflow-visible backdrop-blur-md">
       {[
         { id: "templates", icon: FileText, label: "TEMPLATES" },
         { id: "send", icon: Send, label: "KIRIM" },
