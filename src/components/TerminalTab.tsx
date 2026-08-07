@@ -1,11 +1,62 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { 
-  Trash2, Terminal as TerminalIcon, Zap, RefreshCw, Flame, 
-  ChevronRight, ChevronDown, Layers
+  Trash2, Terminal as TerminalIcon, Zap, RefreshCw, Flame
 } from "lucide-react";
 import { motion } from "motion/react";
 import { LogEntry, SmtpConfig } from "../types";
 import { hn } from "../lib/utils";
+
+// Typing effect component for terminal logs
+const TypewriterText: React.FC<{
+  text: string;
+  speed?: number;
+  onComplete?: () => void;
+  onCharacterTyped?: () => void;
+}> = ({ text, speed = 16, onComplete, onCharacterTyped }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const onCompleteRef = useRef(onComplete);
+  const onTypedRef = useRef(onCharacterTyped);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onTypedRef.current = onCharacterTyped;
+  }, [onComplete, onCharacterTyped]);
+
+  useEffect(() => {
+    let index = 0;
+    setDisplayedText("");
+
+    if (!text || text.length === 0) {
+      if (onCompleteRef.current) {
+        onCompleteRef.current();
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      index += 1;
+      if (index >= text.length) {
+        setDisplayedText(text);
+        clearInterval(timer);
+        if (onTypedRef.current) {
+          onTypedRef.current();
+        }
+        if (onCompleteRef.current) {
+          onCompleteRef.current();
+        }
+      } else {
+        setDisplayedText(text.slice(0, index));
+        if (onTypedRef.current) {
+          onTypedRef.current();
+        }
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return <>{displayedText}</>;
+};
 
 interface TerminalTabProps {
   logs: LogEntry[];
@@ -22,69 +73,33 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
   smtpConfig, 
   setSmtpConfig
 }) => {
-  const terminalEndRef = useRef<HTMLDivElement | null>(null);
+  const terminalContainerRef = useRef<HTMLDivElement | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [isSimulatingBurst, setIsSimulatingBurst] = useState(false);
-  
-  // Collapse & Expand States for clean terminal logs
-  const [isAutoCollapse, setIsAutoCollapse] = useState(true);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const [expandedLogLines, setExpandedLogLines] = useState<Record<number, boolean>>({});
+  // Initialize typingIndex to logs.length so existing historical logs render immediately
+  const [typingIndex, setTypingIndex] = useState(() => logs.length);
+  const isFirstRender = useRef(true);
+
+  const handleScrollToBottom = () => {
+    if (terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
+    }
+  };
 
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [logs]);
-
-  const toggleGroupExpand = (groupId: string) => {
-    setExpandedGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
-  };
-
-  const toggleLineExpand = (index: number) => {
-    setExpandedLogLines(prev => ({ ...prev, [index]: !prev[index] }));
-  };
-
-  // Group sub-logs & background items when Auto-Collapse is enabled
-  const logGroups = useMemo(() => {
-    if (!isAutoCollapse) {
-      return logs.map((log, index) => ({
-        id: `single-${index}`,
-        type: "single" as const,
-        mainLog: log,
-        subLogs: [],
-        originalIndex: index
-      }));
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      setTypingIndex(logs.length);
+      return;
     }
-
-    const result: Array<{
-      id: string;
-      type: "single" | "group";
-      mainLog: LogEntry;
-      subLogs: LogEntry[];
-      originalIndex: number;
-    }> = [];
-
-    for (let i = 0; i < logs.length; i++) {
-      const current = logs[i];
-      const isSub = current.message.trim().startsWith("└─") || 
-                    current.message.trim().startsWith("└") ||
-                    current.message.includes("[WARM-UP THROTTLE]");
-
-      if (isSub && result.length > 0) {
-        result[result.length - 1].type = "group";
-        result[result.length - 1].subLogs.push(current);
-      } else {
-        result.push({
-          id: `group-${i}-${current.timestamp}`,
-          type: "single",
-          mainLog: current,
-          subLogs: [],
-          originalIndex: i
-        });
-      }
+    if (logs.length === 0) {
+      setTypingIndex(0);
     }
+  }, [logs.length]);
 
-    return result;
-  }, [logs, isAutoCollapse]);
+  useEffect(() => {
+    handleScrollToBottom();
+  }, [logs.length, typingIndex]);
 
   // Handle Warm-up Burst & Domain Audit Test directly in terminal
   const handleSimulateWarmupBurst = async () => {
@@ -223,15 +238,17 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
       const results: Array<{ provider: string; status: string; latencyMs: number; modelUsed?: string }> = data.results || [];
 
       if (addLog) {
-        // Log individual provider results
-        results.forEach((item) => {
+        // Stream individual provider results one by one with a delay for realistic terminal typing
+        for (let i = 0; i < results.length; i++) {
+          const item = results[i];
           const isOk = item.status?.includes("OK");
           const logType = isOk ? "success" : "error";
           addLog(
             logType,
             `  └─ [${item.provider.toUpperCase()}] ${item.latencyMs}ms | ${item.status} | Model: ${item.modelUsed || "default"}`
           );
-        });
+          await new Promise((resolve) => setTimeout(resolve, 150));
+        }
 
         // Log summary
         const okResults = results.filter((r) => r.status?.includes("OK"));
@@ -280,22 +297,6 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Auto-Collapse Mode Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsAutoCollapse(!isAutoCollapse)}
-              className={hn(
-                "px-2 py-1 rounded-full flex items-center gap-1 text-[9px] font-extrabold transition-all border cursor-pointer shrink-0 active:scale-95 shadow-xs",
-                isAutoCollapse
-                  ? "bg-indigo-900 text-indigo-200 border-indigo-700 hover:bg-indigo-800"
-                  : "bg-slate-200 text-slate-700 border-slate-300 hover:bg-slate-300"
-              )}
-              title={isAutoCollapse ? "Mode Ringkas Aktif" : "Mode Ringkas Mati"}
-            >
-              <Layers className="w-3 h-3 text-indigo-400" />
-              <span>{isAutoCollapse ? "Auto-Collapse: ON" : "Auto-Collapse: OFF"}</span>
-            </button>
-
             {/* Round Icon Button: Tes Latensi AI */}
             <button
               type="button"
@@ -310,7 +311,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               title="Tes Latensi AI"
             >
               {isTesting ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-600" />
+                <span className="w-3.5 h-3.5 css-spinner text-sky-600" />
               ) : (
                 <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
               )}
@@ -330,7 +331,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               title="Tes Warm-up Burst"
             >
               {isSimulatingBurst ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" />
+                <span className="w-3.5 h-3.5 css-spinner text-amber-600" />
               ) : (
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-pulse" />
               )}
@@ -341,8 +342,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               type="button"
               onClick={() => {
                 setLogs([]);
-                setExpandedGroups({});
-                setExpandedLogLines({});
+                setTypingIndex(0);
               }}
               className="p-1.5 sm:px-2.5 sm:py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 hover:border-rose-300 transition-all flex items-center gap-1 text-[9px] font-extrabold cursor-pointer active:scale-95 shrink-0 shadow-xs"
               title="Hapus / Bersihkan Log Terminal"
@@ -352,8 +352,11 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
           </div>
         </div>
 
-        {/* Terminal Output */}
-        <div className="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-2 font-mono text-[11px] no-scrollbar relative bg-slate-900 text-slate-100">
+        {/* Terminal Output Container with Fixed Scroll Height */}
+        <div 
+          ref={terminalContainerRef}
+          className="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto space-y-1.5 font-mono text-[11px] no-scrollbar relative bg-slate-950 text-slate-100 select-text scroll-smooth"
+        >
           {/* Retro Monitor Grid Overlay */}
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[size:100%_4px] opacity-20 z-10" />
 
@@ -364,104 +367,50 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
             </div>
           )}
 
-          {logGroups.map((group) => {
-            const { id, type, mainLog, subLogs, originalIndex } = group;
-            const isLineExpanded = expandedLogLines[originalIndex];
-            const isGroupExpanded = expandedGroups[id];
-
-            // Truncate long main log text if auto-collapse is enabled
-            const isLongMsg = isAutoCollapse && mainLog.message.length > 110;
-            const displayMsg = isLongMsg && !isLineExpanded 
-              ? mainLog.message.slice(0, 105) + "..."
-              : mainLog.message;
+          {logs.map((log, index) => {
+            if (index > typingIndex) {
+              return null;
+            }
 
             return (
-              <div key={id} className="flex flex-col space-y-1 relative z-10 border-b border-slate-800/40 pb-1.5">
+              <motion.div 
+                key={`log-${index}-${log.timestamp}`} 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.1 }}
+                className="flex flex-col space-y-1 relative z-10 border-b border-slate-800/40 pb-1.5"
+              >
                 <div className="flex gap-2.5 items-start">
                   <span className="text-slate-500 shrink-0 select-none font-bold">
-                    [{mainLog.timestamp}]
+                    [{log.timestamp}]
                   </span>
                   <div className="flex-1">
                     <span
                       className={hn(
                         "leading-relaxed break-words font-semibold",
-                        mainLog.type === "error"
+                        log.type === "error"
                           ? "text-rose-400 font-bold"
-                          : mainLog.type === "success"
+                          : log.type === "success"
                           ? "text-emerald-400 font-bold"
-                          : mainLog.type === "warning"
+                          : log.type === "warning"
                           ? "text-amber-300 animate-pulse"
                           : "text-sky-300"
                       )}
                     >
-                      {displayMsg}
+                      {index === typingIndex ? (
+                        <TypewriterText 
+                          text={log.message} 
+                          speed={16} 
+                          onCharacterTyped={handleScrollToBottom}
+                          onComplete={() => setTypingIndex((prev) => prev + 1)} 
+                        />
+                      ) : (
+                        log.message
+                      )}
                     </span>
-
-                    {/* Button to expand/collapse long message line */}
-                    {isLongMsg && (
-                      <button
-                        type="button"
-                        onClick={() => toggleLineExpand(originalIndex)}
-                        className="ml-2 text-[10px] text-sky-400 hover:text-sky-300 underline font-mono cursor-pointer"
-                      >
-                        {isLineExpanded ? "[Lipat Pesan]" : "[Buka Pesan Penuh]"}
-                      </button>
-                    )}
-
-                    {/* Expand/Collapse Trigger for Sub-logs Group */}
-                    {type === "group" && subLogs.length > 0 && (
-                      <div className="mt-1">
-                        <button
-                          type="button"
-                          onClick={() => toggleGroupExpand(id)}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-sky-300 hover:text-white border border-slate-700/80 rounded-md text-[10px] font-mono cursor-pointer transition-all active:scale-95 shadow-xs"
-                        >
-                          {isGroupExpanded ? (
-                            <ChevronDown className="w-3 h-3 text-sky-400" />
-                          ) : (
-                            <ChevronRight className="w-3 h-3 text-sky-400" />
-                          )}
-                          <span>
-                            {isGroupExpanded
-                              ? `Sembunyikan ${subLogs.length} Rincian Latar Belakang`
-                              : `▶ Rincian Latar Belakang (${subLogs.length} item disembunyikan)`}
-                          </span>
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
-
-                {/* Sub-logs Accordion Items */}
-                {type === "group" && isGroupExpanded && subLogs.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="ml-6 pl-3 border-l-2 border-indigo-500/40 space-y-1 py-1 mt-1 bg-slate-950/40 rounded-r-md p-2"
-                  >
-                    {subLogs.map((sub, sIdx) => (
-                      <div key={sIdx} className="flex gap-2 items-start text-[10.5px]">
-                        <span className="text-slate-500 font-mono">[{sub.timestamp}]</span>
-                        <span
-                          className={hn(
-                            "break-words",
-                            sub.type === "error"
-                              ? "text-rose-400"
-                              : sub.type === "success"
-                              ? "text-emerald-400 font-semibold"
-                              : sub.type === "warning"
-                              ? "text-amber-300"
-                              : "text-slate-300"
-                          )}
-                        >
-                          {sub.message}
-                        </span>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </div>
+              </motion.div>
             );
           })}
 
@@ -470,8 +419,6 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
             <span className="text-emerald-400">&gt; sys_status: OK</span>
             <div className="w-1.5 h-3 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-terminal-blink" />
           </div>
-
-          <div ref={terminalEndRef} />
         </div>
 
         {/* Terminal Footer */}

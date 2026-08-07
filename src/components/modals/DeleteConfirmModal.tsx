@@ -17,12 +17,12 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   return (
     <AnimatePresence>
       {templateToDelete && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-[340px] mx-auto rounded-3xl p-6 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative overflow-hidden text-slate-800"
+            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-[340px] mx-auto rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative overflow-y-auto my-auto max-h-[92dvh] text-slate-800"
           >
             <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center mb-4 text-rose-500">
               <AlertTriangle className="w-7 h-7" />

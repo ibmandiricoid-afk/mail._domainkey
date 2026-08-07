@@ -22,12 +22,12 @@ export const QuickTestModal: React.FC<QuickTestModalProps> = ({
   return (
     <AnimatePresence>
       {quickTestTemplate && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-[320px] mx-auto rounded-2xl border border-slate-200 shadow-2xl p-5 text-slate-800"
+            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-[320px] mx-auto rounded-2xl border border-slate-200 shadow-2xl p-4 sm:p-5 text-slate-800 my-auto max-h-[92dvh] overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-tight">

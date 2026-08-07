@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Info, Loader2, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
+  Info, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
   Compass, Lock, Cloud, LogOut, Key, Bot, FileSignature, Eye, Code, ChevronDown, ChevronUp,
   TrendingUp, Link, Globe, Activity, Flame, RotateCcw, Calendar, Sliders
 } from "lucide-react";
@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { SmtpConfig } from "../types";
 import { hn } from "../lib/utils";
 import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
+import { DomainMxStatusBadge } from "./DomainMxStatusBadge";
 
 interface AccountsTabProps {
   smtpConfig: SmtpConfig;
@@ -621,14 +622,14 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-4 select-none"
+            className="fixed inset-0 z-[200] bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 select-none overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.88, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.88, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-hidden text-white backdrop-blur-md"
+              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-5 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-y-auto my-auto max-h-[92dvh] text-white backdrop-blur-md"
             >
               {/* Background ambient radial glow */}
               <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -953,6 +954,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     placeholder=""
                     className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
                   />
+                  <DomainMxStatusBadge emailInput={smtpConfig.username || smtpConfig.senderEmail || ""} />
                 </div>
 
                 {/* Password / App Password */}
@@ -1616,7 +1618,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               className="flex-1 py-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-extrabold rounded-[28px] shadow-sm transition-all active:scale-[0.98] uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-xs"
             >
               {isSending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="w-4 h-4 css-spinner" />
               ) : (
                 <ShieldCheck className="w-4 h-4" />
               )}
@@ -1639,13 +1641,13 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.95, y: 15, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 15, opacity: 0 }}
-              className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden flex flex-col my-auto max-h-[92dvh]"
             >
               {/* Header */}
               <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
@@ -1811,7 +1813,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[220] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none"
+            className="fixed inset-0 z-[220] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none overflow-y-auto"
             onClick={() => setIsAuditModalOpen(false)}
           >
             <motion.div
@@ -1819,7 +1821,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="w-full max-w-xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92dvh]"
             >
               {/* Header */}
               <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-900 text-white flex items-center justify-between">
@@ -1889,7 +1891,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   >
                     {isAuditingDomain ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                        <span className="w-4 h-4 css-spinner text-slate-950" />
                         <span>Memindai...</span>
                       </>
                     ) : (

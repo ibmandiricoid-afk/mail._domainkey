@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Sparkles, Loader2 } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { RichTextEditor } from "../RichTextEditor";
 
 interface TemplateFormModalProps {
@@ -39,32 +39,32 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
   return (
     <AnimatePresence>
       {showTemplateModal && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
           <motion.div 
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-xl mx-auto rounded-t-[28px] sm:rounded-[28px] border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-slate-800"
+            className="bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-xl mx-auto rounded-t-[28px] sm:rounded-[28px] border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92dvh] my-auto text-slate-800"
           >
             {/* Mobile Handle Bar */}
             <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-slate-50 shrink-0">
               <div className="w-10 h-1 bg-slate-300 rounded-full" />
             </div>
 
-            <div className="px-5 sm:px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
+            <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
               <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">
                 {editingTemplateId ? "Ubah Template" : "Template Baru"}
               </h3>
               <button 
                 onClick={onClose}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 shrink-0 cursor-pointer"
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 shrink-0 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-6 no-scrollbar bg-transparent">
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 no-scrollbar bg-transparent flex-1 min-h-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest px-1">
@@ -91,7 +91,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                     >
                       {isSuggestingCategory ? (
                         <>
-                          <Loader2 className="w-3 h-3 animate-spin text-[#00aff0]" />
+                          <span className="w-3 h-3 css-spinner text-[#00aff0]" />
                           <span>Menganalisis...</span>
                         </>
                       ) : (

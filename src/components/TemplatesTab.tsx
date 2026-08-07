@@ -186,7 +186,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = React.memo(({
           ref={loaderRef} 
           className="mt-12 py-6 flex flex-col items-center justify-center gap-2 border-t border-dashed border-slate-200/80"
         >
-          <div className="w-6 h-6 border-2 border-jago border-t-transparent rounded-full animate-spin" />
+          <span className="w-6 h-6 css-spinner text-jago" />
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
             Memuat template tambahan secara otomatis...
           </p>

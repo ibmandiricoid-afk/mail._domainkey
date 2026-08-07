@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { 
   ShieldCheck, AlertCircle, CheckCircle, Info, 
-  Loader2, AlertTriangle, X, Check, Bot, Trash2, ShieldAlert, Sparkles, Wand2
+  AlertTriangle, X, Check, Bot, Trash2, ShieldAlert, Sparkles, Wand2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RichTextEditor } from "./RichTextEditor";
 import { EmailTemplate, SmtpConfig, SpamReport, EmailValidationRecord } from "../types";
 import { hn, isValidEmail, getEmailTypoFix } from "../lib/utils";
 import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
+import { DomainMxStatusBadge } from "./DomainMxStatusBadge";
 
 interface SendTabProps {
   smtpConfig: SmtpConfig;
@@ -486,59 +487,67 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
     setSendingProgress(10);
     setSendingStage("🧹 Memulai Auto Email Cleaning & Domain Audit...");
 
-    // --- 2. BACKGROUND EMAIL CLEANING (Domain Active & MX Check) ---
+    // --- 2. FAST PARALLEL EMAIL CLEANING (Domain Active & MX Check) ---
     addLog("info", "🧹 [EMAIL CLEANING] Memulai pembersihan daftar email otomatis di latar belakang...");
     const cleanRecipients: string[] = [];
     const deadRecipients: string[] = [];
 
-    for (const recipient of validationAnalysis.validList) {
-      try {
-        const verifyRes = await fetch("/api/verify-recipient", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: recipient })
-        });
-        const verifyData = await verifyRes.json();
-        
-        if (verifyData.isValid) {
+    await Promise.all(
+      validationAnalysis.validList.map(async (recipient) => {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+          const verifyRes = await fetch("/api/verify-recipient", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({ email: recipient })
+          });
+          clearTimeout(timeoutId);
+
+          const verifyData = await verifyRes.json();
+          if (verifyData.isValid) {
+            cleanRecipients.push(recipient);
+            if (setValidationRecords) {
+              setValidationRecords(prev => [
+                {
+                  id: "val_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
+                  email: recipient,
+                  domain: verifyData.domain || recipient.split("@")[1] || "unknown",
+                  status: "Valid",
+                  reason: verifyData.reason || "Domain & Server MX Aktif",
+                  hasMxRecord: true,
+                  timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                },
+                ...prev.filter(r => r.email !== recipient)
+              ]);
+            }
+          } else {
+            deadRecipients.push(recipient);
+            addLog("warning", `🧹 [EMAIL CLEANING] Alamat ${recipient} dikesampingkan dari antrian: ${verifyData.reason}`);
+            if (setValidationRecords) {
+              setValidationRecords(prev => [
+                {
+                  id: "val_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
+                  email: recipient,
+                  domain: recipient.split("@")[1] || "unknown",
+                  status: "Invalid",
+                  reason: verifyData.reason || "MX Server Tidak Ditemukan",
+                  hasMxRecord: false,
+                  typoSuggestion: verifyData.typoSuggestion,
+                  timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                },
+                ...prev.filter(r => r.email !== recipient)
+              ]);
+            }
+          }
+        } catch (_) {
+          // Default to clean on timeout or error so delivery is never stalled
           cleanRecipients.push(recipient);
-          if (setValidationRecords) {
-            setValidationRecords(prev => [
-              {
-                id: "val_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
-                email: recipient,
-                domain: verifyData.domain || recipient.split("@")[1] || "unknown",
-                status: "Valid",
-                reason: verifyData.reason || "Domain & Server MX Aktif",
-                hasMxRecord: true,
-                timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-              },
-              ...prev.filter(r => r.email !== recipient)
-            ]);
-          }
-        } else {
-          deadRecipients.push(recipient);
-          addLog("warning", `🧹 [EMAIL CLEANING] Alamat ${recipient} dikesampingkan dari antrian: ${verifyData.reason}`);
-          if (setValidationRecords) {
-            setValidationRecords(prev => [
-              {
-                id: "val_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
-                email: recipient,
-                domain: recipient.split("@")[1] || "unknown",
-                status: "Invalid",
-                reason: verifyData.reason || "MX Server Tidak Ditemukan",
-                hasMxRecord: false,
-                typoSuggestion: verifyData.typoSuggestion,
-                timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-              },
-              ...prev.filter(r => r.email !== recipient)
-            ]);
-          }
         }
-      } catch (_) {
-        cleanRecipients.push(recipient);
-      }
-    }
+      })
+    );
 
     if (deadRecipients.length > 0) {
       addLog("info", `✨ [EMAIL CLEANING SUCCESS] ${deadRecipients.length} email tidak aktif dikesampingkan untuk mencegah bounce rate tinggi.`);
@@ -672,14 +681,14 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-4 select-none"
+            className="fixed inset-0 z-[200] bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 select-none overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.88, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.88, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-hidden text-white backdrop-blur-md"
+              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-5 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-y-auto my-auto max-h-[92dvh] text-white backdrop-blur-md"
             >
               {/* Background ambient radial glow */}
               <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -1207,6 +1216,13 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                         )}
                       </div>
 
+                      {/* Real-time Async Domain MX Records Check Indicator */}
+                      {emailForm.to && (
+                        <div className="px-1">
+                          <DomainMxStatusBadge emailInput={emailForm.to} />
+                        </div>
+                      )}
+
                       {/* Smart Bounce Guard Card */}
                       {parsedRecipients.length > 0 && !validationAnalysis.isValidAll && (
                         <motion.div
@@ -1430,7 +1446,7 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                           {sendingProgress === 100 ? (
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                           ) : (
-                            <Loader2 className="w-3 h-3 text-emerald-500 animate-spin shrink-0" />
+                            <span className="w-3 h-3 text-emerald-500 css-spinner shrink-0" />
                           )}
                           <span className={`${sendingProgress === 100 ? 'text-emerald-500' : 'text-slate-600'} truncate`}>{sendingStage}</span>
                         </span>

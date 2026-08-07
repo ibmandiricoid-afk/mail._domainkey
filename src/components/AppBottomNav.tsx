@@ -42,7 +42,12 @@ export const AppBottomNav: React.FC<AppBottomNavProps> = ({
             )}
           >
             {isSend ? (
-              <div className="relative flex items-center justify-center transform-gpu">
+              <motion.div 
+                animate={{ scale: isTabActive ? 1.1 : 1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                className="relative flex items-center justify-center transform-gpu"
+              >
                 {/* Clean Ambient Glow */}
                 <div className={hn(
                   "absolute -inset-1 rounded-full transition-opacity duration-300 pointer-events-none",
@@ -69,34 +74,50 @@ export const AppBottomNav: React.FC<AppBottomNavProps> = ({
                     <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full pointer-events-none" />
 
                     {/* Paper Airplane Send Icon */}
-                    <item.icon className={hn(
-                      "w-6 h-6 text-white transition-transform duration-200 relative z-10",
-                      isTabActive ? "translate-x-0.5 -translate-y-0.5 scale-105" : "group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    )} />
+                    <motion.div
+                      animate={{ scale: isTabActive ? 1.15 : 1, rotate: isTabActive ? -4 : 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="relative z-10 flex items-center justify-center"
+                    >
+                      <item.icon className={hn(
+                        "w-6 h-6 text-white transition-transform duration-200",
+                        isTabActive ? "translate-x-0.5 -translate-y-0.5" : "group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      )} />
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ) : (
               <>
-                <div className={hn(
-                  "transition-all duration-300 relative z-10 flex items-center justify-center p-1.5 rounded-xl border",
-                  isTabActive 
-                    ? "bg-white text-[#005291] border-white shadow-md scale-105" 
-                    : "text-white/80 hover:text-white border-transparent hover:bg-white/10"
-                )}>
-                  <item.icon className={hn(
-                    "transition-transform duration-300", 
-                    isSend ? "w-6 h-6 text-white" : "w-4 h-4",
-                    isTabActive && !isSend && "scale-105"
-                  )} />
-                </div>
+                <motion.div 
+                  animate={{ scale: isTabActive ? 1.12 : 1, y: isTabActive ? -1 : 0 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className={hn(
+                    "transition-all duration-300 relative z-10 flex items-center justify-center p-1.5 rounded-xl border",
+                    isTabActive 
+                      ? "bg-white text-[#005291] border-white shadow-md shadow-sky-900/30" 
+                      : "text-white/80 hover:text-white border-transparent hover:bg-white/10"
+                  )}
+                >
+                  <motion.div
+                    animate={{ scale: isTabActive ? 1.15 : 1 }}
+                    transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                  >
+                    <item.icon className="w-4 h-4" />
+                  </motion.div>
+                </motion.div>
                 {!isSend && (
-                  <span className={hn(
-                    "font-black transition-all uppercase tracking-tight relative z-10 mt-0.5 text-[9px] whitespace-nowrap",
-                    isTabActive ? "text-white font-extrabold" : "text-white/75"
-                  )}>
+                  <motion.span 
+                    animate={{ scale: isTabActive ? 1.05 : 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                    className={hn(
+                      "font-black transition-all uppercase tracking-tight relative z-10 mt-0.5 text-[9px] whitespace-nowrap",
+                      isTabActive ? "text-white font-extrabold" : "text-white/75"
+                    )}
+                  >
                     {item.label}
-                  </span>
+                  </motion.span>
                 )}
                 {isTabActive && !isSend && (
                   <motion.div 

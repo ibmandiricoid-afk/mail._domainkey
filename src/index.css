@@ -11,6 +11,10 @@
   --color-jago-orange: #008cc3;
 }
 
+html {
+  font-size: 75%; /* Compact typography scale down (~12px base) */
+}
+
 html, body, #root {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -265,3 +269,36 @@ aside {
   animation: marquee-scroll 25s linear infinite;
   width: max-content;
 }
+
+/* --- Pure CSS Ultra-Lightweight Mobile Loading Animations --- */
+@keyframes css-spin-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes css-pulse-ring-anim {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.css-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 2px;
+  border-color: currentColor;
+  border-top-color: transparent !important;
+  animation: css-spin-rotate 0.65s linear infinite;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.css-pulse-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: css-pulse-ring-anim 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+

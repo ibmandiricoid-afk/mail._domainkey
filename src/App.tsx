@@ -180,7 +180,7 @@ export default function App() {
       type,
       message,
     };
-    setLogs((prev) => [newEntry, ...prev]);
+    setLogs((prev) => [...prev.slice(-99), newEntry]);
   }, []);
 
   // Check Backend SMTP Health

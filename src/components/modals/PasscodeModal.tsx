@@ -36,14 +36,14 @@ export const PasscodeModal: React.FC<PasscodeModalProps> = ({
   return (
     <AnimatePresence>
       {showPasscodeModal && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
           {/* Backdrop */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPasscodeModal(false)}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
 
           {/* Modal Box */}
@@ -51,7 +51,7 @@ export const PasscodeModal: React.FC<PasscodeModalProps> = ({
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="relative bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-md mx-auto rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-2xl z-[1000] text-slate-800 flex flex-col max-h-[88vh] sm:max-h-[85vh] overflow-hidden"
+            className="relative bg-white/95 backdrop-blur-md w-[95%] sm:w-full max-w-md mx-auto rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-2xl z-[1000] text-slate-800 flex flex-col my-auto max-h-[92dvh] sm:max-h-[85vh] overflow-hidden"
           >
             {/* Accent Line */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-600 via-[#005291] to-sky-400" />
