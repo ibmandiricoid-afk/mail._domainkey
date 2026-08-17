@@ -279,7 +279,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="p-2 sm:p-3 w-full h-full max-h-full flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden"
+      className="p-1 sm:p-3 w-full h-full max-h-full flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden"
     >
       <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] flex flex-col h-full max-h-full min-h-0 flex-1 overflow-hidden w-full max-w-4xl">
         {/* Header Bar */}

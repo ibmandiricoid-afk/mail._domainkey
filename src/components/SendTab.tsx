@@ -802,7 +802,7 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
             <form 
               id="send-email-form"
               onSubmit={handleSendEmailSubmit} 
-              className="p-2 sm:p-3 flex-1 flex flex-col justify-between min-h-[380px] transition-all duration-300 pb-3"
+              className="px-1.5 py-2 sm:p-3 flex-1 flex flex-col justify-between min-h-[380px] transition-all duration-300 pb-3 w-full max-w-full mx-auto"
             >
               {/* Responsive Container */}
               <div className="flex-1 flex flex-col gap-2.5 min-h-[360px]">

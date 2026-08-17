@@ -85,7 +85,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = React.memo(({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="px-2 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-7xl mx-auto pb-28"
+      className="px-1.5 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-7xl mx-auto pb-28"
     >
       <div className="flex flex-col justify-between items-start mb-4 gap-3 px-1">
         <div>

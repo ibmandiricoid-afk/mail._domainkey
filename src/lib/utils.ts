@@ -53,13 +53,14 @@ export const getHtmlLinks = (html: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const anchors = doc.querySelectorAll("a");
-    const result: Array<{ text: string; href: string }> = [];
+    const result: Array<{ text: string; href: string; index: number }> = [];
     anchors.forEach((a, index) => {
       const href = a.getAttribute("href") || "";
       if (href && href !== "#") {
         result.push({
           text: a.textContent || a.innerText || `Link ${index + 1}`,
-          href
+          href,
+          index
         });
       }
     });

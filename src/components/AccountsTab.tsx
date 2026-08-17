@@ -663,11 +663,11 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="px-2 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-7xl mx-auto pb-28"
+        className="px-1.5 sm:px-4 md:px-6 py-2 sm:py-3 w-full max-w-7xl mx-auto pb-28"
       >
         <div className="space-y-4">
           {/* --- INTEGRATED FORM & CONFIGURATION CARD --- */}
-          <div className="bg-white rounded-2xl p-3 sm:p-6 border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] space-y-5">
+          <div className="bg-white rounded-2xl p-2.5 sm:p-6 border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] space-y-5">
             
             {/* CARD HEADER WITH LOGO & TITLE */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100/80 gap-3">

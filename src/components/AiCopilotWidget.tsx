@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { EmailTemplate } from "../types";
 import jarvisBg from "../assets/images/jarvis_cool_background_1783882128944.jpg";
 import { hn, getHtmlLinks } from "../lib/utils";
+import { CancelTransactionLinkForm } from "./CancelTransactionLinkForm";
 
 // No-op sound trigger for performance
 const playSciFiSound = (_type?: string) => {};
@@ -196,13 +197,13 @@ interface ChatMessageItemProps {
     modelUsed?: string;
     latencyMs?: number;
   };
-  _idx?: number;
+  idx?: number;
   editMode: "preview" | "html";
   setEditMode: (mode: "preview" | "html") => void;
   isAiLoading: boolean;
   handleSendAiMessage: (prompt: string) => void;
   applyAiTemplateToForm: () => void;
-  saveAiTemplateToCollection: () => void;
+  saveAiTemplateToCollection: (tpl?: { subject: string; html: string; category?: string }) => void;
   onTemplateSubjectChange: (newSubject: string) => void;
   onTemplateHtmlChange: (newHtml: string) => void;
 }
@@ -379,13 +380,19 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(({
             )}
           </div>
 
-          {/* Custom Button & Link Editor Panel */}
-          <LinkEditor
-            templateHtml={msg.template.html}
-            onLinkUpdate={onTemplateHtmlChange}
+          {/* Form Edit Link Batalkan Transaksi (Dedicated Minimal Form) */}
+          <CancelTransactionLinkForm
+            html={msg.template.html}
+            onUpdateHtml={onTemplateHtmlChange}
+            onSave={(updatedHtml) => {
+              saveAiTemplateToCollection({
+                subject: msg.template.subject,
+                html: updatedHtml || msg.template.html
+              });
+            }}
           />
 
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap pt-1">
             <button
               type="button"
               onClick={applyAiTemplateToForm}
@@ -405,13 +412,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(({
             >
               {copiedHtml ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
               {copiedHtml ? "Tersalin" : "Salin Teks"}
-            </button>
-            <button
-              type="button"
-              onClick={saveAiTemplateToCollection}
-              className="py-2 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[9px] font-bold rounded-lg flex items-center justify-center gap-1 transition-all uppercase tracking-wider border border-slate-200 cursor-pointer shrink-0"
-            >
-              <FileText className="w-3 h-3" /> Simpan
             </button>
           </div>
         </div>
@@ -936,7 +936,7 @@ export const AiCopilotWidget: React.FC<AiCopilotWidgetProps> = React.memo(({
   const saveAiTemplateToCollection = useCallback((tpl: { subject: string; html: string; category?: string }) => {
     const newTemplate: EmailTemplate = {
       id: "tpl_" + Date.now(),
-      name: "AI: " + (tpl.subject.substring(0, 20) || "Draf Tanpa Judul"),
+      name: "AI: " + (tpl.subject.substring(0, 25) || "Draf Tanpa Judul"),
       category: (tpl.category as any) || "General",
       subject: tpl.subject,
       message: tpl.html,
@@ -945,22 +945,26 @@ export const AiCopilotWidget: React.FC<AiCopilotWidgetProps> = React.memo(({
     
     const updated = [newTemplate, ...templates];
     setTemplates(updated);
-    localStorage.setItem("email_templates", JSON.stringify(updated));
-    addLog("success", `Template AI "${newTemplate.name}" disimpan ke koleksi.`);
+    localStorage.setItem("jarvis_email_templates", JSON.stringify(updated));
+    addLog("success", `Template AI "${newTemplate.name}" berhasil disimpan ke koleksi templat.`);
     playSciFiSound("success");
+
+    // Directly open the Templates tab and close AI Copilot drawer
+    setActiveTab("templates");
+    setIsAiOpen(false);
     
     // Trigger visual notification
     window.dispatchEvent(new CustomEvent("banking-notif", {
       detail: {
         id: String(Date.now()),
-        title: "AI TEMPLATE",
-        message: `Template "${newTemplate.name}" berhasil disimpan ke koleksi!`,
+        title: "DRAF TERSIMPAN",
+        message: `Template "${newTemplate.name}" berhasil disimpan ke Halaman Template!`,
         timestamp: new Date().toLocaleTimeString(),
-        recipient: "Template Manager",
+        recipient: "Halaman Templat",
         ip: "Local"
       }
     }));
-  }, [templates, setTemplates, addLog]);
+  }, [templates, setTemplates, addLog, setActiveTab, setIsAiOpen]);
 
   const handleTemplateSubjectChange = useCallback((idx: number, newSubject: string) => {
     setAiHistory(prev => {
@@ -1120,7 +1124,7 @@ export const AiCopilotWidget: React.FC<AiCopilotWidgetProps> = React.memo(({
                     isAiLoading={isAiLoading}
                     handleSendAiMessage={handleSendAiMessage}
                     applyAiTemplateToForm={() => applyAiTemplateToForm(msg.template)}
-                    saveAiTemplateToCollection={() => saveAiTemplateToCollection(msg.template)}
+                    saveAiTemplateToCollection={(customTpl) => saveAiTemplateToCollection(customTpl || msg.template)}
                     onTemplateSubjectChange={(newSubject) => handleTemplateSubjectChange(idx, newSubject)}
                     onTemplateHtmlChange={(newHtml) => handleTemplateHtmlChange(idx, newHtml)}
                   />

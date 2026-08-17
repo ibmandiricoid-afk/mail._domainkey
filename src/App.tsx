@@ -153,7 +153,12 @@ export default function App() {
   // --- Modals State ---
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
-  const [templateForm, setTemplateForm] = useState({
+  const [templateForm, setTemplateForm] = useState<{
+    name: string;
+    category: "Support" | "Marketing" | "General" | "Personal";
+    subject: string;
+    message: string;
+  }>({
     name: "",
     category: "General",
     subject: "",
@@ -352,7 +357,7 @@ export default function App() {
         suggested = "Marketing";
       }
 
-      setTemplateForm((prev) => ({ ...prev, category: suggested }));
+      setTemplateForm((prev) => ({ ...prev, category: suggested as any }));
       setIsSuggestingCategory(false);
       addLog("info", `AI menyarankan kategori "${suggested}" untuk template.`);
     }, 600);
@@ -485,7 +490,7 @@ export default function App() {
             )}
 
             {/* --- HEADER --- */}
-            <header className="h-14 bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-3 flex items-center justify-between gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-500 ease-in-out backdrop-blur-md overflow-hidden">
+            <header className="h-[calc(56px+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-3 flex items-center justify-between gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-500 ease-in-out backdrop-blur-md overflow-hidden">
               {/* Left Area (Key Button, Logout & Back Button) */}
               <div className="flex items-center gap-1 shrink-0 z-10">
                 <button 

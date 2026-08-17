@@ -14,7 +14,7 @@ interface LoginViewProps {
 }
 
 // Ultra-smooth easing curve
-const smoothEase = [0.16, 1, 0.3, 1];
+const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 // Staggered variants for keypad buttons
 const containerVariants = {
