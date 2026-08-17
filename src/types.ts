@@ -29,7 +29,7 @@ export interface SmtpConfig {
   host: string;
   port: string;
   username: string;
-  password: "";
+  password: string;
   senderEmail: string;
   fromName: string;
   replyTo: string;
@@ -39,8 +39,6 @@ export interface SmtpConfig {
   sendingAvatarUrl?: string;
   emailSignature?: string;
   enableSignature?: boolean;
-  unsubscribeUrl?: string;
-  enableUnsubscribe?: boolean;
   warmUpSchedule?: WarmUpSchedule;
   // Microsoft Graph API and OAuth2 configuration
   providerType?: "smtp" | "microsoft_graph";

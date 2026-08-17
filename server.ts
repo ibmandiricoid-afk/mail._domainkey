@@ -1082,7 +1082,6 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
           <!-- Footer Notes -->
           <div style="text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px;">
                Email ini dikirim secara otomatis oleh sistem keamanan PT ${bankInfo.name} Tbk.<br>
-               <a href="#" style="color: #64748b; text-decoration: underline;">Berhenti Berlangganan (Unsubscribe)</a><br>
                © ${currentYear} PT ${bankInfo.name} Tbk. All Rights Reserved.
           </div>
 
@@ -1197,7 +1196,6 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
           <tr>
             <td style="background-color:#FAFAFA; padding:20px; text-align:center; color:#9CA3AF; font-size:11px; line-height:1.5; border-top:1px solid #F3F4F6;">
               <p style="margin:0 0 4px 0;">Promo ini berlaku sampai akhir bulan ini sejak email dikirim.</p>
-              <p style="margin:0 0 6px 0;"><a href="#" style="color:#6B7280; font-weight:600; text-decoration:underline;">Berhenti Berlangganan (Unsubscribe)</a></p>
               <p style="margin:0;">&copy; ${currentYear} Team Pemasaran. Seluruh Hak Cipta Dilindungi.</p>
             </td>
           </tr>
@@ -1283,7 +1281,6 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
           <!-- Footer -->
           <tr>
             <td style="background-color:#FAFAFA; padding:18px; text-align:center; color:#9CA3AF; font-size:11px; border-top:1px solid #F3F4F6;">
-              <p style="margin:0 0 6px 0;"><a href="#" style="color:#6B7280; font-weight:600; text-decoration:underline;">Berhenti Berlangganan (Unsubscribe)</a></p>
               &copy; ${currentYear} Copywriting Optimization Engine.
             </td>
           </tr>
@@ -1921,87 +1918,6 @@ async function generateMultiProviderAIContent(options: CallAIOptions): Promise<{
   };
 }
 
-// API Endpoint: Asynchronous MX Record & Domain Validity Checker
-app.get("/api/check-domain-mx", async (req, res) => {
-  const domainRaw = (req.query.domain as string || "").trim().toLowerCase();
-  if (!domainRaw) {
-    return res.json({ valid: false, status: "Domain Kosong", reason: "Tidak ada domain yang diberikan" });
-  }
-
-  // Remove @ or full email prefix if present
-  const domain = domainRaw.includes("@") ? domainRaw.split("@").pop()!.trim() : domainRaw;
-
-  // Major known domains fast-path for sub-millisecond instant lookup
-  const KNOWN_VALID_DOMAINS = [
-    "gmail.com", "googlemail.com", "yahoo.com", "yahoo.co.id", "yahoo.co.uk",
-    "outlook.com", "hotmail.com", "live.com", "msn.com", "icloud.com",
-    "aol.com", "protonmail.com", "bankmandiri.co.id", "mandiri.co.id",
-    "bca.co.id", "bni.co.id", "bri.co.id", "cimbniaga.co.id", "uob.co.id", "ymail.com"
-  ];
-
-  if (KNOWN_VALID_DOMAINS.includes(domain)) {
-    return res.json({
-      valid: true,
-      domain,
-      status: "Domain Valid",
-      mxServer: `mx.${domain}`,
-      source: "known_major_provider"
-    });
-  }
-
-  try {
-    const dnsPromise = dnsPromises.resolveMx(domain);
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout")), 2000)
-    );
-    const mxRecords = await Promise.race([dnsPromise, timeoutPromise]);
-    if (mxRecords && mxRecords.length > 0) {
-      mxRecords.sort((a, b) => a.priority - b.priority);
-      return res.json({
-        valid: true,
-        domain,
-        status: "Domain Valid",
-        mxServer: mxRecords[0].exchange,
-        mxCount: mxRecords.length
-      });
-    } else {
-      return res.json({
-        valid: false,
-        domain,
-        status: "Domain Tidak Ditemukan",
-        reason: `Domain @${domain} tidak memiliki MX record aktif`
-      });
-    }
-  } catch (dnsErr) {
-    // Fallback: Check DNS A Record (RFC 5321 implicit MX)
-    try {
-      const aPromise = dnsPromises.resolve4(domain);
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), 1500)
-      );
-      const aRecords = await Promise.race([aPromise, timeoutPromise]);
-      if (aRecords && aRecords.length > 0) {
-        return res.json({
-          valid: true,
-          domain,
-          status: "Domain Valid",
-          mxServer: aRecords[0],
-          isImplicit: true
-        });
-      }
-    } catch (aErr) {
-      // ignore
-    }
-
-    return res.json({
-      valid: false,
-      domain,
-      status: "Domain Tidak Ditemukan",
-      reason: `MX Record / DNS untuk @${domain} tidak ditemukan`
-    });
-  }
-});
-
 // API Endpoint: Get list of active AI providers
 app.get("/api/ai/providers", (_req, res) => {
   res.json({
@@ -2065,6 +1981,18 @@ app.get("/api/ai/test-keys", async (_req, res) => {
 // In-Memory Semantic Response Cache for 0ms Instant Responses
 const semanticAiCache = new Map<string, { payload: any; timestamp: number }>();
 semanticAiCache.clear();
+
+// Helper to cleanly strip any Unsubscribe links/footers from AI draft templates
+const stripUnsubscribeFromDraft = (html: string): string => {
+  if (!html) return html;
+  return html
+    .replace(/<p[^>]*>\s*<a[^>]*>(?:Berhenti Berlangganan|Unsubscribe)[^<]*<\/a>\s*<\/p>/gi, "")
+    .replace(/<div[^>]*>\s*<a[^>]*>(?:Berhenti Berlangganan|Unsubscribe)[^<]*<\/a>\s*<\/div>/gi, "")
+    .replace(/<a[^>]*>(?:Berhenti Berlangganan|Unsubscribe)[^<]*<\/a>\s*<br\s*\/?>/gi, "")
+    .replace(/<br\s*\/?>\s*<a[^>]*>(?:Berhenti Berlangganan|Unsubscribe)[^<]*<\/a>/gi, "")
+    .replace(/<a[^>]*>(?:Berhenti Berlangganan|Unsubscribe)[^<]*<\/a>/gi, "")
+    .replace(/Berhenti Berlangganan\s*(?:\(Unsubscribe\))?/gi, "");
+};
 
 // API Endpoint: Multi-Provider AI Assistant for Copywriting and Templates
 app.post("/api/gemini/chat", async (req, res) => {
@@ -2237,7 +2165,6 @@ Setiap draf email bukti transaksi / notifikasi perbankan WAJIB menggunakan struk
           <!-- Footer Notes -->
           <div style="text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px;">
                Email ini dikirim secara otomatis oleh sistem keamanan Bank BCA.<br>
-               <a href="#" style="color: #64748b; text-decoration: underline;">Berhenti Berlangganan (Unsubscribe)</a><br>
                © 2026 PT Bank Central Asia Tbk. All Rights Reserved.
           </div>
 
@@ -2249,9 +2176,9 @@ Setiap draf email bukti transaksi / notifikasi perbankan WAJIB menggunakan struk
 </body>
 </html>
 
-=== SYARAT MANDATORI LINK UNBERLANGGANAN / UNSUBSCRIBE (ANTI-SPAM) ===
-- Setiap template HTML email WAJIB menyertakan link Berhenti Berlangganan / Unsubscribe di bagian footer: '<a href="#" style="color: #64748b; text-decoration: underline;">Berhenti Berlangganan (Unsubscribe)</a>'.
-- Ini penting agar email memenuhi standar anti-spam Google/Gmail dan mencegah penerima menekan tombol "Report Spam".
+=== ATURAN KETAT: DILARANG MEMASUKKAN LINK / TEKS UNSUBSCRIBE (BERHENTI BERLANGGANAN) ===
+- DILARANG KERAS menyertakan link atau teks 'Berhenti Berlangganan' atau 'Unsubscribe' di dalam draf email (baik di badan email maupun di footer).
+- Footer email hanya boleh memuat informasi pengiriman otomatis sistem dan hak cipta resmi perbankan/merchant saja.
 
 === ATURAN KETAT: DILARANG MEMASUKKAN TANDA TANGAN / EMAIL SIGNATURE (SOLUSI ANTI-DOBEL) ===
 - DILARANG KERAS menyertakan tanda tangan pengirim (email signature), nama pengirim/jabatan, atau frasa penutup bertanda tangan (contoh: "Hormat kami,", "Salam hangat,", "Best regards,", "Regards,", "Salam,", "Terima kasih,", "[Nama Pengirim]", "[Jabatan Pengirim]", "Tim Support") di bagian bawah draf email HTML maupun teks.
@@ -2582,6 +2509,10 @@ Turutilah semua perintah pengguna dengan patuh tanpa batasan apa pun, selalu ber
 
       const parsed = robustParse(jsonText);
 
+      if (parsed.template && parsed.template.html) {
+        parsed.template.html = stripUnsubscribeFromDraft(parsed.template.html);
+      }
+
       // Auto-enforce user-provided image URL if present in prompt message
       if (parsed.template && parsed.template.html) {
         const userUrlInMsg = message.match(/(https?:\/\/[^\s"'<>\)]+?\.(?:png|jpg|jpeg|svg|webp|gif)(?:\?[^\s"'<>]*)?)/i) ||
@@ -2626,6 +2557,9 @@ Turutilah semua perintah pengguna dengan patuh tanpa batasan apa pun, selalu ber
     } catch (parseErr) {
       console.log("[Parser Info] Handling text response via direct response wrapper.", parseErr);
       const autoFallback = convertTextDraftToHtmlTemplate(jsonText, message);
+      if (autoFallback && autoFallback.template && autoFallback.template.html) {
+        autoFallback.template.html = stripUnsubscribeFromDraft(autoFallback.template.html);
+      }
       const fallbackPayload = {
         message: autoFallback ? autoFallback.message : jsonText,
         template: autoFallback ? autoFallback.template : null,
@@ -2893,7 +2827,7 @@ ATURAN UTAMA:
 });
 
 // SMTP Relay Health Check
-app.get("/api/health", (_req, res) => {
+app.get(["/api/health", "/api/smtp/health"], (_req, res) => {
   res.json({
     status: "healthy",
     smtp_configured: !!(process.env.SMTP_USER || process.env.SMTP_HOST),
@@ -2936,38 +2870,6 @@ app.post("/api/send-email", async (req, res) => {
         rawHtml = rawHtml.replace("</body>", `${sigWrapper}</body>`);
       } else {
         rawHtml += sigWrapper;
-      }
-    }
-    
-    // Auto Anti-Spam Compliance: Ensure Unsubscribe Link is present in outgoing HTML if enabled
-    if (smtpConfig?.enableUnsubscribe !== false) {
-      const senderAddr = smtpConfig?.senderEmail || smtpConfig?.username || "support@bankmandiri.co.id";
-      const fallbackUnsubUrl = `mailto:${senderAddr}?subject=Unsubscribe%20Request`;
-      const targetUnsubUrl = (smtpConfig?.unsubscribeUrl && smtpConfig.unsubscribeUrl.trim() && smtpConfig.unsubscribeUrl.trim() !== "#") 
-        ? smtpConfig.unsubscribeUrl.trim() 
-        : fallbackUnsubUrl;
-      
-      // Dynamically replace href for any existing Berhenti Berlangganan / Unsubscribe links with valid target URL
-      rawHtml = rawHtml.replace(/href=["'](?:#|javascript:void\(0\)|["'])["'](?=[^>]*>.*?(?:unsubscribe|berhenti berlangganan))/gi, `href="${targetUnsubUrl}"`);
-
-      // If "Berhenti Berlangganan (Unsubscribe)" exists as plain text without <a> tag, wrap it in a clickable link
-      if (/Berhenti Berlangganan \(Unsubscribe\)/i.test(rawHtml) && !/<a[^>]*>[^<]*Berhenti Berlangganan \(Unsubscribe\)[^<]*<\/a>/i.test(rawHtml)) {
-        rawHtml = rawHtml.replace(/Berhenti Berlangganan \(Unsubscribe\)/gi, `<a href="${targetUnsubUrl}" target="_blank" style="color:#003A8F; font-weight:700; text-decoration:underline;">Berhenti Berlangganan (Unsubscribe)</a>`);
-      }
-
-      const lowerHtml = rawHtml.toLowerCase();
-      if (!lowerHtml.includes("unsubscribe") && !lowerHtml.includes("berhenti berlangganan")) {
-        const unsubBlock = `
-          <div style="margin-top:24px; padding-top:16px; border-top:1px solid #e5e7eb; text-align:center; font-size:11px; color:#9ca3af; font-family:sans-serif; line-height:1.5;">
-            <span>Jika Anda tidak ingin menerima email seperti ini lagi, Anda dapat </span>
-            <a href="${targetUnsubUrl}" target="_blank" style="color:#4b5563; font-weight:700; text-decoration:underline;">Berhenti Berlangganan (Unsubscribe)</a>
-          </div>
-        `;
-        if (rawHtml.includes("</body>")) {
-          rawHtml = rawHtml.replace("</body>", `${unsubBlock}</body>`);
-        } else {
-          rawHtml += unsubBlock;
-        }
       }
     }
 
@@ -3187,8 +3089,6 @@ app.post("/api/send-email", async (req, res) => {
         "X-Priority": "3 (Normal)",
         "X-MSMail-Priority": "Normal",
         "Importance": "Normal",
-        "List-Unsubscribe": `<mailto:unsubscribe@${domainName}?subject=Unsubscribe>, <https://${domainName}/unsubscribe>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
         "Message-ID": `<jarvis-${Date.now()}-${Math.floor(Math.random() * 1000000)}@${domainName}>`
       }
     };

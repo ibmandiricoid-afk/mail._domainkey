@@ -331,8 +331,9 @@ export default function App() {
   }, []);
 
   // Template Handlers
-  const handleTemplateMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTemplateForm({ ...templateForm, message: e.target.value });
+  const handleTemplateMessageChange = (val: string | React.ChangeEvent<HTMLTextAreaElement>) => {
+    const messageStr = typeof val === "string" ? val : (val?.target?.value ?? "");
+    setTemplateForm((prev) => ({ ...prev, message: messageStr }));
   };
 
   const handleSuggestCategory = () => {
@@ -357,8 +358,10 @@ export default function App() {
     }, 600);
   };
 
-  const handleSaveTemplateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveTemplateSubmit = (e?: React.FormEvent) => {
+    if (e && typeof e.preventDefault === "function") {
+      e.preventDefault();
+    }
     if (!templateForm.name.trim() || !templateForm.subject.trim() || !templateForm.message.trim()) {
       return;
     }

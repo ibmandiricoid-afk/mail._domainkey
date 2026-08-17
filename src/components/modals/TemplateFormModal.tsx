@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Loader2 } from "lucide-react";
 import { RichTextEditor } from "../RichTextEditor";
 
 interface TemplateFormModalProps {
@@ -91,7 +91,7 @@ export const TemplateFormModal: React.FC<TemplateFormModalProps> = ({
                     >
                       {isSuggestingCategory ? (
                         <>
-                          <span className="w-3 h-3 css-spinner text-[#00aff0]" />
+                          <Loader2 className="w-3 h-3 animate-spin text-[#00aff0]" />
                           <span>Menganalisis...</span>
                         </>
                       ) : (

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Info, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
-  Compass, Lock, Cloud, LogOut, Key, Bot, FileSignature, Eye, Code, ChevronDown, ChevronUp,
-  TrendingUp, Link, Globe, Activity, Flame, RotateCcw, Calendar, Sliders
+  Info, Loader2, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
+  Compass, Lock, Cloud, LogOut, Key, FileSignature, Eye, Code, ChevronDown, ChevronUp,
+  TrendingUp, Globe, Activity, Flame, RotateCcw, Calendar, Sliders, Camera
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SmtpConfig } from "../types";
 import { hn } from "../lib/utils";
 import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
-import { DomainMxStatusBadge } from "./DomainMxStatusBadge";
+import { SecurityRadarScanner } from "./SecurityRadarScanner";
 
 interface AccountsTabProps {
   smtpConfig: SmtpConfig;
@@ -629,213 +629,30 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.88, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-5 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-y-auto my-auto max-h-[92dvh] text-white backdrop-blur-md"
+              className="w-full max-w-sm flex flex-col items-center my-auto"
             >
-              {/* Background ambient radial glow */}
-              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 -right-10 w-36 h-36 bg-rose-500/15 rounded-full blur-2xl pointer-events-none" />
-
-              {/* Central Hologram Avatar Energy Hub */}
-              <div className="relative w-40 h-40 flex items-center justify-center mb-6 shrink-0">
-                
-                {/* 1. Concentric Sonar Ripples expanding outwards from center */}
-                {testProgress < 100 && !testFailed && (
-                  <>
-                    <motion.div 
-                      className="absolute inset-2 rounded-full border border-amber-500/40 pointer-events-none"
-                      animate={{ scale: [1, 1.45], opacity: [0.7, 0] }}
-                      transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
-                    />
-                    <motion.div 
-                      className="absolute inset-2 rounded-full border border-rose-500/30 pointer-events-none"
-                      animate={{ scale: [1, 1.65], opacity: [0.5, 0] }}
-                      transition={{ repeat: Infinity, duration: 2, delay: 0.6, ease: "easeOut" }}
-                    />
-                  </>
-                )}
-
-                {/* 2. Outer Rotating Counter-Clockwise Orbit Ring */}
-                <motion.div 
-                  className="absolute inset-0 rounded-full border border-dashed border-amber-400/40 pointer-events-none"
-                  animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-                />
-
-                {/* 3. Glowing Progress Arc Ring */}
-                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-                  {/* Background Track Circle */}
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="72"
-                    className="stroke-slate-800/80 fill-none"
-                    strokeWidth="3.5"
-                  />
-                  {/* Active Progress Circle */}
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="72"
-                    className={hn(
-                      "stroke-current fill-none transition-all duration-300",
-                      testFailed ? "text-rose-500" : testProgress === 100 ? "text-emerald-400" : "text-amber-400"
-                    )}
-                    strokeWidth="4.5"
-                    strokeDasharray={`${2 * Math.PI * 72}`}
-                    strokeDashoffset={`${2 * Math.PI * 72 * (1 - testProgress / 100)}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-
-                {/* 4. Main Pulsing Avatar Image Badge (Center Heartbeat with CSS Keyframes) */}
-                <div 
-                  className={hn(
-                    "relative w-32 h-32 rounded-full overflow-hidden [clip-path:circle(50%_at_50%_50%)] border-2 shadow-2xl bg-slate-950 flex items-center justify-center p-0.5 z-0 origin-center transition-all duration-500",
-                    testProgress < 100 && !testFailed ? "animate-pulse-avatar" : "",
-                    testFailed 
-                      ? "border-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.5)] scale-100" 
-                      : testProgress === 100 
-                      ? "border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.5)] scale-100" 
-                      : "border-amber-400/90 shadow-[0_0_30px_rgba(245,158,11,0.45)]"
-                  )}
-                >
-                  {/* High-Tech Fallback AI Avatar Core in background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#002b4d] to-slate-950 flex flex-col items-center justify-center p-2 z-0 rounded-full overflow-hidden">
-                    <div className="p-2.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 shadow-[0_0_20px_rgba(56,189,248,0.4)] animate-pulse">
-                      <Bot className="w-9 h-9 text-sky-400" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-sky-300 mt-1">JARVIS AI</span>
-                  </div>
-
-                  {/* Visual Sending Avatar Image with fallbacks */}
-                  <img 
-                    src={smtpConfig.sendingAvatarUrl || defaultAvatarImg} 
-                    alt="Foto Visual Pengiriman Email" 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (target.src !== defaultAvatarImg) {
-                        target.src = defaultAvatarImg;
-                      }
-                    }}
-                    className={hn(
-                      "relative z-10 w-full h-full object-cover rounded-full select-none origin-center transition-transform duration-300",
-                      testProgress < 100 && !testFailed ? "scale-105" : "scale-100"
-                    )}
-                  />
-
-                  {/* Laser Scan Sweep Line */}
-                  {testProgress < 100 && !testFailed && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-300/30 to-transparent animate-[scan_1.5s_linear_infinite] pointer-events-none rounded-full overflow-hidden" />
-                  )}
-
-                  {/* Completion / Error Overlay Badge */}
-                  {testProgress === 100 && (
-                    <motion.div 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className={hn(
-                        "absolute inset-0 flex items-center justify-center z-20 rounded-full overflow-hidden",
-                        testFailed ? "bg-rose-950/85" : "bg-slate-950/80"
-                      )}
-                    >
-                      {testFailed ? (
-                        <div className="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)]">
-                          <X className="w-8 h-8" />
-                        </div>
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.7)]">
-                          <Check className="w-8 h-8" />
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Live Status Pill at Bottom Center */}
-                <div className="absolute -bottom-2 z-30">
-                  <span className={hn(
-                    "text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full border shadow-lg flex items-center gap-1.5 backdrop-blur-md",
-                    testFailed
-                      ? "bg-rose-950/90 border-rose-500/60 text-rose-300"
-                      : testProgress < 100
-                      ? "bg-amber-950/90 border-amber-500/60 text-amber-300"
-                      : "bg-emerald-950/90 border-emerald-500/60 text-emerald-300"
-                  )}>
-                    {testProgress < 100 && !testFailed && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                    )}
-                    {testFailed ? "Koneksi Gagal" : testProgress < 100 ? "UJI DIAGNOSTIK" : "Terhubung"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Status stage description */}
-              <h3 className="text-sm font-extrabold text-amber-300 tracking-tight text-center uppercase mb-1 drop-shadow-sm">
-                {testStage}
-              </h3>
-              
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-mono font-black text-slate-300 tracking-wider">
-                  PROGRESS: <span className="text-amber-400 font-bold">{testProgress}%</span>
-                </span>
-              </div>
-
-              {/* Glowing High-Tech Progress Bar */}
-              <div className="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden mb-6 border border-slate-700/50 p-0.5 shadow-inner">
-                <div 
-                  className={hn(
-                    "h-full rounded-full transition-all duration-300 relative overflow-hidden",
-                    testFailed 
-                      ? "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]" 
-                      : testProgress === 100
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
-                      : "bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
-                  )}
-                  style={{ width: `${testProgress}%` }}
-                >
-                  <div className="absolute inset-0 bg-white/30 animate-[scan_1.2s_linear_infinite]" />
-                </div>
-              </div>
-
-              {/* Action Button for finished status (Success / Fail) */}
-              {testProgress === 100 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="w-full flex justify-center z-20"
-                >
-                  {testFailed ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTestFailed(false);
-                        setShowRocketScreen(false);
-                        setTestProgress(0);
-                        setTestStage("");
-                      }}
-                      className="w-full py-2.5 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-rose-400/30"
-                    >
-                      <X className="w-4 h-4" />
-                      TUTUP DIAGNOSTIK
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSmtpTestSuccess(false);
-                        setShowRocketScreen(false);
-                        setTestProgress(0);
-                        setTestStage("");
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/30"
-                    >
-                      <Check className="w-4 h-4" />
-                      TUTUP DIAGNOSTIK
-                    </button>
-                  )}
-                </motion.div>
-              )}
+              <SecurityRadarScanner
+                progress={testProgress}
+                stage={testStage}
+                isCompleted={testProgress === 100}
+                hasFailed={testFailed}
+                avatarUrl={smtpConfig.sendingAvatarUrl}
+                statusPillText={testFailed ? "KONEKSI GAGAL" : testProgress < 100 ? "UJI DIAGNOSTIK" : "TERHUBUNG"}
+                closeButtonText="TUTUP DIAGNOSTIK"
+                onClose={() => {
+                  if (testFailed) {
+                    setTestFailed(false);
+                    setShowRocketScreen(false);
+                    setTestProgress(0);
+                    setTestStage("");
+                  } else {
+                    setSmtpTestSuccess(false);
+                    setShowRocketScreen(false);
+                    setTestProgress(0);
+                    setTestStage("");
+                  }
+                }}
+              />
             </motion.div>
           </motion.div>
         )}
@@ -923,20 +740,61 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
 
             <hr className="border-slate-100" />
 
-            {/* FORM 1: NAMA PENGIRIM (FROM NAME) */}
+            {/* FORM 1: NAMA PENGIRIM (FROM NAME) & FOTO PROFIL */}
             <div className="space-y-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap">
-                  <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  Nama Pengirim (From Name)
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <label 
+                  className="relative shrink-0 cursor-pointer group/avatar rounded-2xl overflow-hidden border-2 border-dashed border-sky-400 hover:border-sky-500 bg-slate-900 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center p-0.5 hover:ring-2 hover:ring-sky-300 transition-all shadow-md"
+                  title="Klik untuk mengubah foto profile/avatar pengirim"
+                >
+                  <img 
+                    src={smtpConfig.sendingAvatarUrl || defaultAvatarImg} 
+                    alt="Foto Profil Pengirim" 
+                    onError={(e) => { e.currentTarget.src = defaultAvatarImg; }}
+                    className="w-full h-full object-cover rounded-xl group-hover/avatar:scale-105 transition-transform"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
+                    <Camera className="w-5 h-5 text-white drop-shadow-sm" />
+                  </div>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                          const result = evt.target?.result as string;
+                          if (result) {
+                            setSmtpConfig(prev => ({ ...prev, sendingAvatarUrl: result }));
+                            addLog("success", "Foto profil pengiriman email berhasil diperbarui!");
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
                 </label>
-                <input 
-                  type="text" 
-                  value={smtpConfig.fromName || ""}
-                  onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
-                  placeholder=""
-                  className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
-                />
+
+                <div className="flex-1 w-full flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap">
+                      <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                      Nama Pengirim (From Name)
+                    </label>
+                    <span className="text-[9px] font-bold text-sky-600">
+                      Klik foto untuk ganti avatar
+                    </span>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={smtpConfig.fromName || ""}
+                    onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
+                    placeholder=""
+                    className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
+                  />
+                </div>
               </div>
 
               {/* FORM 2 & 3: EMAIL & PASSWORD */}
@@ -954,7 +812,6 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     placeholder=""
                     className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
                   />
-                  <DomainMxStatusBadge emailInput={smtpConfig.username || smtpConfig.senderEmail || ""} />
                 </div>
 
                 {/* Password / App Password */}
@@ -1099,66 +956,6 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   </div>
                 </motion.div>
               )}
-            </div>
-
-            <hr className="border-slate-100" />
-
-            {/* FORM 5: PENGATURAN LINK BERHENTI BERLANGGANAN (UNSUBSCRIBE URL) */}
-            <div className="py-3 text-left">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-600 shrink-0">
-                      <Link className="w-3 h-3" />
-                    </div>
-                    <span>URL Berhenti Berlangganan (Unsubscribe)</span>
-                    {smtpConfig.enableUnsubscribe !== false && (
-                      smtpConfig.unsubscribeUrl ? (
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="URL Kustom Aktif"></span>
-                      ) : (
-                        <span className="w-2 h-2 rounded-full bg-slate-300 shrink-0" title="Default Mailto / Link"></span>
-                      )
-                    )}
-                  </label>
-
-                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={smtpConfig.enableUnsubscribe !== false}
-                      onChange={(e) => setSmtpConfig({ ...smtpConfig, enableUnsubscribe: e.target.checked })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                  </label>
-                </div>
-
-                {smtpConfig.enableUnsubscribe !== false && (
-                  <div className="space-y-2">
-                    <div className="relative flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={smtpConfig.unsubscribeUrl || ""}
-                        onChange={(e) => setSmtpConfig({ ...smtpConfig, unsubscribeUrl: e.target.value })}
-                        placeholder=""
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-purple-500 rounded-xl text-xs font-mono text-slate-800 focus:outline-none transition-all shadow-xs"
-                      />
-                      {smtpConfig.unsubscribeUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setSmtpConfig({ ...smtpConfig, unsubscribeUrl: "" })}
-                          className="px-3 py-2 bg-slate-200 hover:bg-rose-100 text-slate-700 hover:text-rose-600 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0"
-                          title="Reset URL"
-                        >
-                          Reset
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-[10.5px] text-slate-400 font-medium">
-                      URL ini akan otomatis disisipkan pada footer email penerima.
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
 
           </div>
@@ -1618,7 +1415,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               className="flex-1 py-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-extrabold rounded-[28px] shadow-sm transition-all active:scale-[0.98] uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-xs"
             >
               {isSending ? (
-                <span className="w-4 h-4 css-spinner" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <ShieldCheck className="w-4 h-4" />
               )}
@@ -1891,7 +1688,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   >
                     {isAuditingDomain ? (
                       <>
-                        <span className="w-4 h-4 css-spinner text-slate-950" />
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                         <span>Memindai...</span>
                       </>
                     ) : (

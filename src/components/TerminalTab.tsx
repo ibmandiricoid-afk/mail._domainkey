@@ -311,7 +311,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               title="Tes Latensi AI"
             >
               {isTesting ? (
-                <span className="w-3.5 h-3.5 css-spinner text-sky-600" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-600" />
               ) : (
                 <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
               )}
@@ -331,7 +331,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               title="Tes Warm-up Burst"
             >
               {isSimulatingBurst ? (
-                <span className="w-3.5 h-3.5 css-spinner text-amber-600" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" />
               ) : (
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-pulse" />
               )}

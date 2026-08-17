@@ -2,9 +2,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { 
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, 
   List, ListOrdered, Link2, Type, Palette, Code, Eye, Eraser,
-  ChevronDown, Sparkles, Briefcase, Zap, Smile, Target
+  ChevronDown, Sparkles, Briefcase, Zap, Smile, Target, Loader2
 } from "lucide-react";
-import { HtmlSyntaxEditor } from "./HtmlSyntaxEditor";
 
 interface RichTextEditorProps {
   value: string;
@@ -337,7 +336,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
 
             <span className="w-px h-5 bg-slate-200 mx-1 shrink-0" />
 
-            {/* Link & Unsubscribe & Clear */}
+            {/* Link & Clear */}
             <button
               type="button"
               onClick={insertLink}
@@ -366,7 +365,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
                 title="Ubah & Sempurnakan Nada Bahasa dengan Gemini AI"
               >
                 {isImprovingTone ? (
-                  <span className="w-3.5 h-3.5 css-spinner text-amber-600" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
                 ) : (
                   <Sparkles className="w-3.5 h-3.5 text-amber-600 fill-amber-300" />
                 )}
@@ -493,14 +492,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
           </div>
         ) : (
           <div className="w-full max-w-[480px] mx-auto flex flex-col items-center">
-            <HtmlSyntaxEditor
+            <textarea
               value={htmlValue}
-              onChange={(newVal) => {
-                setHtmlValue(newVal);
-                onChange(newVal);
-              }}
-              minHeight={minHeight}
+              onChange={handleHtmlChange}
               placeholder={placeholder}
+              className="w-full h-full min-h-[inherit] max-w-[480px] p-3 text-slate-100 text-xs font-mono focus:outline-none bg-[#040914] resize-none leading-relaxed tracking-wide rounded-xl border border-slate-800 shadow-xs"
+              style={{ minHeight }}
             />
           </div>
         )}

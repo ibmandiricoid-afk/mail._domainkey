@@ -72,7 +72,7 @@ export const getHtmlLinks = (html: string) => {
 export function getActiveSignature(): string {
   if (typeof window === "undefined") return "";
   try {
-    const saved = localStorage.getItem("relay_smtp_config") || localStorage.getItem("smtp_account");
+    const saved = localStorage.getItem("jarvis_smtp_config") || localStorage.getItem("relay_smtp_config") || localStorage.getItem("smtp_account");
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.enableSignature !== false && parsed.emailSignature && typeof parsed.emailSignature === "string" && parsed.emailSignature.trim()) {

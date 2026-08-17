@@ -14,8 +14,8 @@ interface PasscodeModalProps {
   setNewPasscodeForm: (val: string) => void;
   confirmPasscodeForm: string;
   setConfirmPasscodeForm: (val: string) => void;
-  autoLockTimeout?: "1min" | "5min" | "15min" | "30min" | "never";
-  setAutoLockTimeout?: (val: "1min" | "5min" | "15min" | "30min" | "never") => void;
+  autoLockTimeout?: number;
+  setAutoLockTimeout?: (val: number) => void;
 }
 
 export const PasscodeModal: React.FC<PasscodeModalProps> = ({
@@ -30,7 +30,7 @@ export const PasscodeModal: React.FC<PasscodeModalProps> = ({
   setNewPasscodeForm,
   confirmPasscodeForm,
   setConfirmPasscodeForm,
-  autoLockTimeout = "5min",
+  autoLockTimeout = 15,
   setAutoLockTimeout
 }) => {
   return (
@@ -100,14 +100,18 @@ export const PasscodeModal: React.FC<PasscodeModalProps> = ({
                   </label>
                   <select
                     value={autoLockTimeout}
-                    onChange={(e) => setAutoLockTimeout(e.target.value as any)}
+                    onChange={(e) => {
+                      const minutes = parseInt(e.target.value, 10);
+                      setAutoLockTimeout(minutes);
+                      localStorage.setItem("jarvis_autolock_minutes", minutes.toString());
+                    }}
                     className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-sky-600 shadow-2xs cursor-pointer"
                   >
-                    <option value="1min">1 Menit Tidak Aktif</option>
-                    <option value="5min">5 Menit (Standar Disarankan)</option>
-                    <option value="15min">15 Menit</option>
-                    <option value="30min">30 Menit</option>
-                    <option value="never">Jangan Pernah Kunci Otomatis (Kunci Manual)</option>
+                    <option value={1}>1 Menit Tidak Aktif</option>
+                    <option value={5}>5 Menit</option>
+                    <option value={15}>15 Menit (Standar Disarankan)</option>
+                    <option value={30}>30 Menit</option>
+                    <option value={0}>Jangan Pernah Kunci Otomatis (Kunci Manual)</option>
                   </select>
                 </div>
               )}

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { 
   ShieldCheck, AlertCircle, CheckCircle, Info, 
-  AlertTriangle, X, Check, Bot, Trash2, ShieldAlert, Sparkles, Wand2
+  Loader2, AlertTriangle, X, Check, Trash2, ShieldAlert, Wand2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RichTextEditor } from "./RichTextEditor";
 import { EmailTemplate, SmtpConfig, SpamReport, EmailValidationRecord } from "../types";
 import { hn, isValidEmail, getEmailTypoFix } from "../lib/utils";
 import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
-import { DomainMxStatusBadge } from "./DomainMxStatusBadge";
+import { SecurityRadarScanner } from "./SecurityRadarScanner";
 
 interface SendTabProps {
   smtpConfig: SmtpConfig;
@@ -313,13 +313,6 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
       if ((message.match(/https?:\/\//g) || []).length > 3) {
         score -= 20;
         tips.push("Terlalu banyak tautan/link");
-      }
-
-      // Anti-spam compliance: Note that Unsubscribe link is automatically attached by server engine
-      const msgLower = message.toLowerCase();
-      const hasUnsub = msgLower.includes("unsubscribe") || msgLower.includes("berhenti berlangganan");
-      if (hasUnsub) {
-        tips.push("Link Unsubscribe terdeteksi dalam konten");
       }
 
       score = Math.max(0, score);
@@ -674,7 +667,7 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
 
   return (
     <>
-      {/* High-tech Cyber Hologram Overlay for active email sending */}
+      {/* High-tech Cyber Security Radar Overlay for active email sending */}
       <AnimatePresence>
         {sendingProgress > 0 && (
           <motion.div
@@ -688,211 +681,28 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.88, opacity: 0, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-slate-900/90 border border-amber-500/30 rounded-3xl p-5 sm:p-8 flex flex-col items-center shadow-[0_25px_60px_-10px_rgba(245,158,11,0.25)] relative overflow-y-auto my-auto max-h-[92dvh] text-white backdrop-blur-md"
+              className="w-full max-w-sm flex flex-col items-center my-auto"
             >
-              {/* Background ambient radial glow */}
-              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 -right-10 w-36 h-36 bg-rose-500/15 rounded-full blur-2xl pointer-events-none" />
-
-              {/* Central Hologram Avatar Energy Hub */}
-              <div className="relative w-52 h-52 flex items-center justify-center mb-6 shrink-0">
-                
-                {/* 1. Concentric Sonar Ripples expanding outwards from center */}
-                {sendingProgress < 100 && !hasFailed && (
-                  <>
-                    <motion.div 
-                      className="absolute inset-2 rounded-full border border-amber-500/40 pointer-events-none"
-                      animate={{ scale: [1, 1.45], opacity: [0.7, 0] }}
-                      transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
-                    />
-                    <motion.div 
-                      className="absolute inset-2 rounded-full border border-rose-500/30 pointer-events-none"
-                      animate={{ scale: [1, 1.65], opacity: [0.5, 0] }}
-                      transition={{ repeat: Infinity, duration: 2, delay: 0.6, ease: "easeOut" }}
-                    />
-                  </>
-                )}
-
-                {/* 2. Outer Rotating Counter-Clockwise Orbit Ring */}
-                <motion.div 
-                  className="absolute inset-0 rounded-full border border-dashed border-amber-400/40 pointer-events-none"
-                  animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-                />
-
-                {/* 3. Glowing Progress Arc Ring */}
-                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-                  {/* Background Track Circle */}
-                  <circle
-                    cx="104"
-                    cy="104"
-                    r="94"
-                    className="stroke-slate-800/80 fill-none"
-                    strokeWidth="4"
-                  />
-                  {/* Active Progress Circle */}
-                  <circle
-                    cx="104"
-                    cy="104"
-                    r="94"
-                    className={hn(
-                      "stroke-current fill-none transition-all duration-300",
-                      hasFailed ? "text-rose-500" : sendingProgress === 100 ? "text-emerald-400" : "text-amber-400"
-                    )}
-                    strokeWidth="5"
-                    strokeDasharray={`${2 * Math.PI * 94}`}
-                    strokeDashoffset={`${2 * Math.PI * 94 * (1 - sendingProgress / 100)}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-
-                {/* 4. Main Pulsing Avatar Image Badge (Center Heartbeat with CSS Keyframes) */}
-                <div 
-                  className={hn(
-                    "relative w-42 h-42 rounded-full overflow-hidden [clip-path:circle(50%_at_50%_50%)] border-2 shadow-2xl bg-slate-950 flex items-center justify-center p-0.5 z-0 origin-center transition-all duration-500",
-                    sendingProgress < 100 && !hasFailed ? "animate-pulse-avatar" : "",
-                    hasFailed 
-                      ? "border-rose-500 shadow-[0_0_35px_rgba(244,63,94,0.6)] scale-100" 
-                      : sendingProgress === 100 
-                      ? "border-emerald-400 shadow-[0_0_35px_rgba(52,211,153,0.6)] scale-100" 
-                      : "border-amber-400/90 shadow-[0_0_35px_rgba(245,158,11,0.55)]"
-                  )}
-                >
-                  {/* High-Tech Fallback AI Avatar Core in background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#002b4d] to-slate-950 flex flex-col items-center justify-center p-2 z-0 rounded-full overflow-hidden">
-                    <div className="p-3 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 shadow-[0_0_20px_rgba(56,189,248,0.4)] animate-pulse">
-                      <Bot className="w-12 h-12 text-sky-400" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-sky-300 mt-1.5">JARVIS AI</span>
-                  </div>
-
-                  {/* Visual Sending Avatar Image with fallbacks */}
-                  <img 
-                    src={smtpConfig.sendingAvatarUrl || defaultAvatarImg} 
-                    alt="Foto Visual Pengiriman Email" 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (target.src !== defaultAvatarImg) {
-                        target.src = defaultAvatarImg;
-                      }
-                    }}
-                    className={hn(
-                      "relative z-10 w-full h-full object-cover rounded-full select-none origin-center transition-transform duration-300",
-                      sendingProgress < 100 && !hasFailed ? "scale-105" : "scale-100"
-                    )}
-                  />
-
-                  {/* Laser Scan Sweep Line */}
-                  {sendingProgress < 100 && !hasFailed && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-300/30 to-transparent animate-[scan_1.5s_linear_infinite] pointer-events-none rounded-full overflow-hidden" />
-                  )}
-
-                  {/* Completion / Error Overlay Badge */}
-                  {sendingProgress === 100 && (
-                    <motion.div 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className={hn(
-                        "absolute inset-0 flex items-center justify-center z-20 rounded-full overflow-hidden",
-                        hasFailed ? "bg-rose-950/85" : "bg-slate-950/80"
-                      )}
-                    >
-                      {hasFailed ? (
-                        <div className="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)]">
-                          <X className="w-8 h-8" />
-                        </div>
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.7)]">
-                          <Check className="w-8 h-8" />
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Live Status Pill at Bottom Center */}
-                <div className="absolute -bottom-2 z-30">
-                  <span className={hn(
-                    "text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full border shadow-lg flex items-center gap-1.5 backdrop-blur-md",
-                    hasFailed
-                      ? "bg-rose-950/90 border-rose-500/60 text-rose-300"
-                      : sendingProgress < 100
-                      ? "bg-amber-950/90 border-amber-500/60 text-amber-300"
-                      : "bg-emerald-950/90 border-emerald-500/60 text-emerald-300"
-                  )}>
-                    {sendingProgress < 100 && !hasFailed && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                    )}
-                    {hasFailed ? "Gagal" : sendingProgress < 100 ? "JARVIS RELAY" : "Tersebar"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Status stage description */}
-              <h3 className="text-sm font-extrabold text-amber-300 tracking-tight text-center uppercase mb-1 drop-shadow-sm">
-                {sendingStage}
-              </h3>
-              
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-mono font-black text-slate-300 tracking-wider">
-                  PERSENTASE: <span className="text-amber-400 font-bold">{sendingProgress}%</span>
-                </span>
-              </div>
-
-              {/* Glowing High-Tech Progress Bar */}
-              <div className="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden mb-6 border border-slate-700/50 p-0.5 shadow-inner">
-                <div 
-                  className={hn(
-                    "h-full rounded-full transition-all duration-300 relative overflow-hidden",
-                    hasFailed 
-                      ? "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]" 
-                      : sendingProgress === 100
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
-                      : "bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
-                  )}
-                  style={{ width: `${sendingProgress}%` }}
-                >
-                  <div className="absolute inset-0 bg-white/30 animate-[scan_1.2s_linear_infinite]" />
-                </div>
-              </div>
-
-              {/* Action Button for finished status (Success / Fail) */}
-              {sendingProgress === 100 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="w-full flex justify-center z-20"
-                >
-                  {hasFailed ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHasFailed(false);
-                        setSendingProgress(0);
-                        setSendingStage("");
-                      }}
-                      className="w-full py-2.5 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-rose-400/30"
-                    >
-                      <X className="w-4 h-4" />
-                      TUTUP DIAGNOSTIK
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSuccessBanner(null);
-                        setSendingProgress(0);
-                        setSendingStage("");
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/30"
-                    >
-                      <Check className="w-4 h-4" />
-                      TUTUP DIAGNOSTIK
-                    </button>
-                  )}
-                </motion.div>
-              )}
+              <SecurityRadarScanner
+                progress={sendingProgress}
+                stage={sendingStage}
+                isCompleted={sendingProgress === 100}
+                hasFailed={hasFailed}
+                avatarUrl={smtpConfig.sendingAvatarUrl}
+                statusPillText={hasFailed ? "GAGAL" : sendingProgress < 100 ? "JARVIS RELAY" : "TERSEBAR"}
+                closeButtonText="TUTUP DIAGNOSTIK"
+                onClose={() => {
+                  if (hasFailed) {
+                    setHasFailed(false);
+                    setSendingProgress(0);
+                    setSendingStage("");
+                  } else {
+                    setSuccessBanner(null);
+                    setSendingProgress(0);
+                    setSendingStage("");
+                  }
+                }}
+              />
             </motion.div>
           </motion.div>
         )}
@@ -1216,13 +1026,6 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                         )}
                       </div>
 
-                      {/* Real-time Async Domain MX Records Check Indicator */}
-                      {emailForm.to && (
-                        <div className="px-1">
-                          <DomainMxStatusBadge emailInput={emailForm.to} />
-                        </div>
-                      )}
-
                       {/* Smart Bounce Guard Card */}
                       {parsedRecipients.length > 0 && !validationAnalysis.isValidAll && (
                         <motion.div
@@ -1446,7 +1249,7 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                           {sendingProgress === 100 ? (
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                           ) : (
-                            <span className="w-3 h-3 text-emerald-500 css-spinner shrink-0" />
+                            <Loader2 className="w-3 h-3 text-emerald-500 animate-spin shrink-0" />
                           )}
                           <span className={`${sendingProgress === 100 ? 'text-emerald-500' : 'text-slate-600'} truncate`}>{sendingStage}</span>
                         </span>

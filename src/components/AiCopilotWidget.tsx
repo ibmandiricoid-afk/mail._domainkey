@@ -34,7 +34,10 @@ interface LinkEditorProps {
 }
 
 const LinkEditor: React.FC<LinkEditorProps> = React.memo(({ templateHtml, onLinkUpdate }) => {
-  const links = useMemo(() => getHtmlLinks(templateHtml), [templateHtml]);
+  const links = useMemo(() => {
+    const allLinks = getHtmlLinks(templateHtml);
+    return allLinks.filter(l => !/unsubscribe|berhenti berlangganan/i.test(l.text) && !/unsubscribe|berhenti berlangganan/i.test(l.href));
+  }, [templateHtml]);
 
   if (links.length === 0) return null;
 
