@@ -855,8 +855,8 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank Mandiri",
         logo: customLogo || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1280px-Bank_Mandiri_logo_2016.svg.png",
-        accent: "#0050b3",
-        gradient: "linear-gradient(135deg, #0050b3 0%, #002266 100%)",
+        accent: "#003d79",
+        gradient: "linear-gradient(135deg, #003d79 0%, #002266 100%)",
         height: "24px"
       };
     }
@@ -864,8 +864,8 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank Central Asia (BCA)",
         logo: customLogo || "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/3840px-Bank_Central_Asia.svg.png",
-        accent: "#0050b3",
-        gradient: "linear-gradient(135deg, #0050b3 0%, #002d8a 100%)",
+        accent: "#005baa",
+        gradient: "linear-gradient(135deg, #005baa 0%, #002d8a 100%)",
         height: "24px"
       };
     }
@@ -873,8 +873,8 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank CIMB Niaga",
         logo: customLogo || "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/CIMB_Niaga_logo.svg/1280px-CIMB_Niaga_logo.svg.png",
-        accent: "#d32f2f",
-        gradient: "linear-gradient(135deg, #d32f2f 0%, #7f0000 100%)",
+        accent: "#7f0000",
+        gradient: "linear-gradient(135deg, #a71930 0%, #7f0000 100%)",
         height: "24px"
       };
     }
@@ -882,8 +882,8 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank UOB",
         logo: customLogo || "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/UOB_Logo_%282022%29.svg/1280px-UOB_Logo_%282022%29.svg.png",
-        accent: "#0c2340",
-        gradient: "linear-gradient(135deg, #0c2340 0%, #000d21 100%)",
+        accent: "#002b66",
+        gradient: "linear-gradient(135deg, #002b66 0%, #000d21 100%)",
         height: "24px"
       };
     }
@@ -891,8 +891,8 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank BRI",
         logo: customLogo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYbaueVKlosO6iWM_KKUKEf3KZt4nZPKT5UQWv10s3_h0DEPTzM7QRKJE&s=10",
-        accent: "#0050b3",
-        gradient: "linear-gradient(135deg, #0050b3 0%, #003399 100%)",
+        accent: "#00529c",
+        gradient: "linear-gradient(135deg, #00529c 0%, #003399 100%)",
         height: "24px"
       };
     }
@@ -900,17 +900,17 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
       return {
         name: "Bank BNI",
         logo: customLogo || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToR9U9f9Qr6kxTnO4IImlgqk7PUDFcBjfWRX8ftCoSkw&s=10",
-        accent: "#008080",
-        gradient: "linear-gradient(135deg, #008080 0%, #004d40 100%)",
+        accent: "#f15a24",
+        gradient: "linear-gradient(135deg, #f15a24 0%, #d84315 100%)",
         height: "24px"
       };
     }
-    // Default fallback bank
+    // Default fallback bank (Mandiri)
     return {
       name: "Bank Mandiri",
       logo: customLogo || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1280px-Bank_Mandiri_logo_2016.svg.png",
-      accent: "#0050b3",
-      gradient: "linear-gradient(135deg, #0050b3 0%, #002266 100%)",
+      accent: "#003d79",
+      gradient: "linear-gradient(135deg, #003d79 0%, #002266 100%)",
       height: "24px"
     };
   };
@@ -994,30 +994,31 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=600, initial-scale=1.0">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
     <title>${subject}</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         img { -ms-interpolation-mode: bicubic; }
+        .email-card { width: 520px !important; min-width: 520px !important; max-width: 520px !important; }
     </style>
 </head>
 <body style="font-family: 'Segoe UI', Arial, sans-serif, -apple-system; background-color: #f4f5f7; margin: 0; padding: 20px 12px 60px 12px; -webkit-text-size-adjust: 100%;">
 
-<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; width: 100%;">
+<table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; width: 600px !important; min-width: 600px !important; max-width: 600px !important; margin: 0 auto; table-layout: fixed;">
   <tr>
     <td align="center" style="padding: 10px 0 40px 0;">
-      <div style="background-color: #ffffff; width: 100%; max-width: 440px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); overflow: hidden; padding: 24px 20px 28px 20px; box-sizing: border-box; margin: 0 auto; text-align: left;">
+      <div class="email-card" style="background-color: #ffffff; width: 520px; min-width: 520px; max-width: 520px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); overflow: hidden; padding: 24px 20px 28px 20px; box-sizing: border-box; margin: 0 auto; text-align: left;">
           
           <!-- Header Logo (Anti-Gepeng) -->
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
               <img src="${bankInfo.logo}" alt="Logo ${bankInfo.name}" width="auto" height="42" style="max-width: 160px; max-height: 48px; width: auto; height: auto; object-fit: contain; aspect-ratio: auto; display: inline-block; border: 0; outline: none; text-decoration: none;">
           </div>
 
-          <!-- Status Icon Circle Blue -->
+          <!-- Status Icon Circle -->
           <div style="text-align: center; margin-top: 24px; margin-bottom: 12px;">
-              <div style="width: 52px; height: 52px; background-color: #0066b2; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <div style="width: 52px; height: 52px; background-color: ${bankInfo.accent}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: 0 auto;">
                       <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
@@ -1043,7 +1044,7 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
               <tr>
                   <td style="padding: 6px 0; font-size: 13px; color: #6b7280; font-weight: 500;">No. Referensi</td>
                   <td style="padding: 6px 0; font-size: 13px; text-align: right;">
-                      <a href="#" style="color: #0066b2; font-weight: 700; text-decoration: underline;">3122${Date.now().toString().slice(-8)}</a>
+                      <a href="#" style="color: ${bankInfo.accent}; font-weight: 700; text-decoration: underline;">3122${Date.now().toString().slice(-8)}</a>
                   </td>
               </tr>
           </table>
@@ -1061,7 +1062,7 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
               </tr>
               <tr>
                   <td style="padding: 6px 0; font-size: 13px; color: #6b7280; font-weight: 500;">Nominal</td>
-                  <td style="padding: 6px 0; font-size: 16px; color: #0066b2; font-weight: 800; text-align: right;">${amount}</td>
+                  <td style="padding: 6px 0; font-size: 16px; color: ${bankInfo.accent}; font-weight: 800; text-align: right;">${amount}</td>
               </tr>
               <tr>
                   <td style="padding: 6px 0; font-size: 13px; color: #6b7280; font-weight: 500;">Keterangan</td>
@@ -1070,11 +1071,11 @@ function localFallbackGenerator(message: string, formattedDate: string, _formatt
           </table>
 
           <!-- Rounded Notice Box & CTA Button -->
-          <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 18px 16px; margin-top: 24px; text-align: center;">
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid ${bankInfo.accent}; border-radius: 12px; padding: 18px 16px; margin-top: 24px; text-align: center;">
               <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin: 0 0 14px 0; text-align: center;">
                   PENTING: Jika transaksi di atas bukan dilakukan oleh Anda, silakan lakukan pembatalan instan untuk mengamankan limit kartu kredit Anda.
               </p>
-              <a href="#" style="display: block; width: 100%; background-color: #0066b2; color: #ffffff; text-align: center; padding: 13px 0; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,102,178,0.25);">
+              <a href="#" style="display: block; width: 100%; background-color: ${bankInfo.accent}; color: #ffffff; text-align: center; padding: 13px 0; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                   Batalkan Transaksi
               </a>
           </div>
@@ -2070,6 +2071,12 @@ Daftar Logo Bawaan (Hanya digunakan jika pengguna TIDAK memberikan link gambar s
 - Bank BRI: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYbaueVKlosO6iWM_KKUKEf3KZt4nZPKT5UQWv10s3_h0DEPTzM7QRKJE&s=10
 - Bank BNI: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToR9U9f9Qr6kxTnO4IImlgqk7PUDFcBjfWRX8ftCoSkw&s=10
 
+=== ATURAN MUTLAK: UKURAN EMAIL FIXED WIDTH (CANVAS TETAP SAMA PADA HP KECIL MAUPUN LEBAR) ===
+- Seluruh draf email HTML WAJIB dirancang menggunakan Fixed Width Canvas agar saat dibuka di layar HP yang kecil maupun lebar, ukuran, proporsi, dan tata letak email TETAP SAMA PERSIS dan TIDAK BERUBAH.
+- Gunakan tag meta viewport fixed: <meta name="viewport" content="width=600, initial-scale=1.0">
+- Pembungkus tabel utama WAJIB menggunakan: width="600" style="width: 600px !important; min-width: 600px !important; max-width: 600px !important; margin: 0 auto; table-layout: fixed;"
+- Kontainer kartu utama di dalamnya WAJIB menggunakan: style="width: 520px; max-width: 520px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); overflow: hidden; padding: 24px 20px 28px 20px; box-sizing: border-box; margin: 0 auto; text-align: left;"
+
 === CETAK BIRU KODE HTML WAJIB (MUTLAK SAMA PERSIS SEPERTI BUKTI CONTOH) ===
 Setiap draf email bukti transaksi / notifikasi perbankan WAJIB menggunakan struktur HTML persis di bawah ini dalam properti "template.html":
 
@@ -2077,21 +2084,22 @@ Setiap draf email bukti transaksi / notifikasi perbankan WAJIB menggunakan struk
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=600, initial-scale=1.0">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
     <title>Notifikasi Transaksi Kartu Kredit</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         img { -ms-interpolation-mode: bicubic; }
+        .email-card { width: 520px !important; min-width: 520px !important; max-width: 520px !important; }
     </style>
 </head>
 <body style="font-family: 'Segoe UI', Arial, sans-serif, -apple-system; background-color: #f4f5f7; margin: 0; padding: 20px 12px 60px 12px; -webkit-text-size-adjust: 100%;">
 
-<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; width: 100%;">
+<table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; width: 600px !important; min-width: 600px !important; max-width: 600px !important; margin: 0 auto; table-layout: fixed;">
   <tr>
     <td align="center" style="padding: 10px 0 40px 0;">
-      <div style="background-color: #ffffff; width: 100%; max-width: 440px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); overflow: hidden; padding: 24px 20px 28px 20px; box-sizing: border-box; margin: 0 auto; text-align: left;">
+      <div class="email-card" style="background-color: #ffffff; width: 520px; min-width: 520px; max-width: 520px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); overflow: hidden; padding: 24px 20px 28px 20px; box-sizing: border-box; margin: 0 auto; text-align: left;">
           
           <!-- Header Logo (Anti-Gepeng) -->
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">

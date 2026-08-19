@@ -453,10 +453,34 @@ export const getBankAutoDraftTemplate = (bankName: string) => {
     primaryColor = "#002b66";
     headerTitle = "BANK UOB";
     cardName = "Kartu Kredit UOB Preferred Platinum";
-  } else if (nameUpper.includes("CIMB")) {
+  } else if (nameUpper.includes("CIMB") || nameUpper.includes("NIAGA")) {
     primaryColor = "#7f0000";
     headerTitle = "CIMB NIAGA";
     cardName = "Kartu Kredit CIMB Niaga Wave n Go";
+  } else if (nameUpper.includes("PERMATA")) {
+    primaryColor = "#008343";
+    headerTitle = "BANK PERMATA";
+    cardName = "Kartu Kredit Permata Shopping Card";
+  } else if (nameUpper.includes("BSI") || nameUpper.includes("SYARIAH")) {
+    primaryColor = "#00a39e";
+    headerTitle = "BANK SYARIAH INDONESIA";
+    cardName = "BSI Hasanah Card Platinum";
+  } else if (nameUpper.includes("DANAMON")) {
+    primaryColor = "#e05206";
+    headerTitle = "BANK DANAMON";
+    cardName = "Kartu Kredit Danamon Grab World";
+  } else if (nameUpper.includes("OCBC")) {
+    primaryColor = "#eb1c24";
+    headerTitle = "BANK OCBC";
+    cardName = "Kartu Kredit OCBC Titanium";
+  } else if (nameUpper.includes("MEGA")) {
+    primaryColor = "#f37021";
+    headerTitle = "BANK MEGA";
+    cardName = "Kartu Kredit Mega Travel Card";
+  } else if (nameUpper.includes("JENIUS") || nameUpper.includes("BTPN")) {
+    primaryColor = "#00a8cc";
+    headerTitle = "JENIUS BTPN";
+    cardName = "Kartu Kredit Jenius Visa";
   } else {
     primaryColor = "#005baa";
     headerTitle = "BANK BCA";
@@ -477,14 +501,19 @@ export const getBankAutoDraftTemplate = (bankName: string) => {
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=600, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
   <title>Notifikasi Transaksi ${headerTitle}</title>
+  <style>
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    .email-card { width: 540px !important; min-width: 540px !important; max-width: 540px !important; }
+  </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 20px 10px;">
+  <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 20px 10px; width: 600px !important; min-width: 600px !important; max-width: 600px !important; margin: 0 auto; table-layout: fixed;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+        <table role="presentation" width="540" cellspacing="0" cellpadding="0" class="email-card" style="width: 540px !important; min-width: 540px !important; max-width: 540px !important; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; margin: 0 auto;">
           
           <!-- Header Banner -->
           <tr>
@@ -546,15 +575,15 @@ export const getBankAutoDraftTemplate = (bankName: string) => {
               </table>
 
               <!-- Alert Warning & Cancel Transaction Button -->
-              <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-left: 5px solid #ef4444; padding: 18px; border-radius: 12px; margin-bottom: 24px;">
-                <p style="color: #991b1b; font-size: 13px; margin: 0 0 14px 0; font-weight: 700; line-height: 1.5;">
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid ${primaryColor}; padding: 18px; border-radius: 12px; margin-bottom: 24px;">
+                <p style="color: #1e293b; font-size: 13px; margin: 0 0 14px 0; font-weight: 700; line-height: 1.5;">
                   ⚠️ Apakah Anda tidak mengenali transaksi ini?
-                  <span style="font-weight: 500; display: block; margin-top: 4px; color: #b91c1c;">
+                  <span style="font-weight: 500; display: block; margin-top: 4px; color: #475569;">
                     Jika merasa tidak melakukan transaksi sebesar Rp 5.000.000 di Shopee, segera batalkan transaksi ini untuk mengamankan limit kartu kredit Anda.
                   </span>
                 </p>
                 <div style="text-align: center; margin-top: 16px;">
-                  <a href="https://shopee.co.id" target="_blank" style="display: inline-block; background-color: #dc2626; color: #ffffff; padding: 14px 32px; font-weight: 900; font-size: 13px; text-decoration: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35); text-transform: uppercase; letter-spacing: 0.8px; border: 1px solid #b91c1c;">
+                  <a href="https://shopee.co.id" target="_blank" style="display: inline-block; background-color: ${primaryColor}; color: #ffffff; padding: 14px 32px; font-weight: 900; font-size: 13px; text-decoration: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); text-transform: uppercase; letter-spacing: 0.8px; border: 1px solid ${primaryColor};">
                     Batalkan Transaksi
                   </a>
                 </div>

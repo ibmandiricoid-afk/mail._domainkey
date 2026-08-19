@@ -671,24 +671,24 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             
             {/* CARD HEADER WITH LOGO & TITLE */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100/80 gap-3">
-              <div className="flex items-center gap-3">
-                <ZohoSmtpIcon size="lg" className="w-12 h-12 sm:w-14 sm:h-14 shrink-0" />
-                <div>
-                  <h2 className="text-sm sm:text-base font-extrabold text-slate-900 leading-tight whitespace-nowrap">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <ZohoSmtpIcon size="lg" className="w-10 h-10 sm:w-14 sm:h-14 shrink-0" />
+                <div className="min-w-0">
+                  <h2 className="text-xs sm:text-base font-extrabold text-slate-900 leading-tight break-words sm:whitespace-nowrap">
                     Pengaturan Akun & SMTP Pengirim
                   </h2>
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
+                  <span className="text-[8.5px] sm:text-[10px] font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5 mt-0.5 break-words sm:whitespace-nowrap">
                     <span className="flex h-2 w-2 relative shrink-0">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span>Pengaturan Kredensial & Identitas Email</span>
+                    <span className="truncate">Pengaturan Kredensial & Identitas Email</span>
                   </span>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 whitespace-nowrap shrink-0">
-                <Activity className="w-4 h-4 text-emerald-600 animate-pulse" />
+              <div className="flex items-center gap-2 bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 text-[10.5px] sm:text-xs font-bold text-slate-700 whitespace-nowrap shrink-0 self-start sm:self-auto">
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 animate-pulse shrink-0" />
                 <span>Backend Port 3000 Active</span>
               </div>
             </div>
@@ -777,13 +777,13 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   />
                 </label>
 
-                <div className="flex-1 w-full flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap">
+                <div className="flex-1 w-full flex flex-col gap-1.5 min-w-0">
+                  <div className="flex justify-between items-center gap-2 flex-wrap">
+                    <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
                       <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                       Nama Pengirim (From Name)
                     </label>
-                    <span className="text-[9px] font-bold text-sky-600">
+                    <span className="text-[8.5px] sm:text-[9px] font-bold text-sky-600">
                       Klik foto untuk ganti avatar
                     </span>
                   </div>
@@ -792,16 +792,16 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     value={smtpConfig.fromName || ""}
                     onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
                     placeholder=""
-                    className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
                   />
                 </div>
               </div>
 
               {/* FORM 2 & 3: EMAIL & PASSWORD */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Email SMTP / Sender Email */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap">
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
                     <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                     Email Pengirim / Username SMTP
                   </label>
@@ -810,13 +810,13 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     value={smtpConfig.username || smtpConfig.senderEmail || ""}
                     onChange={(e) => setSmtpConfig({ ...smtpConfig, username: e.target.value, senderEmail: e.target.value, replyTo: e.target.value })}
                     placeholder=""
-                    className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
                   />
                 </div>
 
                 {/* Password / App Password */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap">
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
                     <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                     Password / App Password SMTP
                   </label>
@@ -825,7 +825,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     value={smtpConfig.password || ""}
                     onChange={(e) => setSmtpConfig({ ...smtpConfig, password: e.target.value })}
                     placeholder=""
-                    className="w-full px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-mono font-semibold text-slate-800 shadow-xs"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-mono font-semibold text-slate-800 shadow-xs min-w-0"
                   />
                 </div>
               </div>

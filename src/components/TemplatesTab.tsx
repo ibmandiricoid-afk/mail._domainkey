@@ -85,23 +85,27 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = React.memo(({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="px-1.5 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-7xl mx-auto pb-28"
+      className="px-1.5 sm:px-4 md:px-6 py-2 sm:py-3 w-full max-w-7xl mx-auto pb-28 landscape:py-1.5"
     >
-      <div className="flex flex-col justify-between items-start mb-4 gap-3 px-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3.5 sm:mb-5 gap-2.5 sm:gap-4 px-0.5">
         <div>
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
-            Template Email
+          <h2 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+            Template Email ({filteredTemplates.length})
           </h2>
+          <p className="text-[11px] text-slate-500 font-semibold hidden sm:block">
+            Koleksi rancangan email siap pakai & cepat disesuaikan
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[280px]">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input 
               type="text" 
               value={templateSearch}
               onChange={(e) => setTemplateSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-semibold focus:border-jago focus:ring-1 focus:ring-jago/20 text-slate-800 placeholder:text-slate-400/80 outline-none transition-all shadow-sm"
+              placeholder="Cari template, subjek, kategori..."
+              className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-semibold focus:border-jago focus:ring-1 focus:ring-jago/20 text-slate-800 placeholder:text-slate-400/80 outline-none transition-all shadow-xs"
             />
           </div>
 
@@ -111,68 +115,70 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = React.memo(({
               setTemplateForm({ name: "", category: "General", subject: "", message: "" });
               setShowTemplateModal(true);
             }}
-            className="w-9 h-9 bg-jago hover:bg-jago-hover text-white rounded-xl flex items-center justify-center shadow-md shadow-jago/10 transition-all active:scale-90 shrink-0 cursor-pointer"
+            className="h-9 px-3 bg-jago hover:bg-jago-hover text-white rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-jago/10 transition-all active:scale-95 shrink-0 cursor-pointer font-black text-xs uppercase tracking-wider"
           >
             <Plus className="w-4 h-4" />
+            <span className="hidden xs:inline">Buat Template</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {visibleTemplates.map((t) => (
           <motion.div 
             key={t.id}
-            className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_8px_24px_-4px_rgba(15,23,42,0.08)] hover:shadow-[0_12px_32px_-6px_rgba(15,23,42,0.12)] hover:border-slate-300 transition-all group"
+            className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_28px_-4px_rgba(15,23,42,0.12)] hover:border-slate-300 transition-all group flex flex-col justify-between"
           >
-            <div className="p-3.5 sm:p-5 flex flex-col h-full justify-between">
+            <div className="p-3 sm:p-4 flex flex-col h-full justify-between gap-3">
               <div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-extrabold uppercase rounded-full border border-slate-200">
+                <div className="flex justify-between items-center mb-2 gap-2">
+                  <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 text-[9.5px] font-extrabold uppercase rounded-full border border-slate-200/90 tracking-wide shrink-0">
                     {t.category}
                   </span>
                   <button 
                     onClick={() => setTemplateToDelete(t)}
-                    className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                    className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all cursor-pointer shrink-0"
+                    title="Hapus Template"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <h3 className="font-extrabold text-slate-800 mb-1 leading-tight text-sm">
+                <h3 className="font-extrabold text-slate-800 mb-1 leading-snug text-xs sm:text-sm break-words line-clamp-2">
                   {t.name}
                 </h3>
-                <p className="text-xs text-slate-500 font-bold mb-6 line-clamp-2 leading-relaxed">
-                  {t.subject}
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium mb-2 sm:mb-4 line-clamp-2 leading-relaxed break-words">
+                  {t.subject || "(Tanpa Subjek)"}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex gap-1.5 xs:gap-2 items-center">
+              <div className="pt-2 sm:pt-2.5 border-t border-slate-100 flex items-center gap-1 sm:gap-1.5 min-w-0">
                 <button 
                   onClick={() => startEditTemplate(t)}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0"
+                  className="w-7 h-7 sm:w-9 sm:h-9 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0 cursor-pointer"
                   title="Edit Draft"
                 >
-                  <Pen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Pen className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
                 <button 
                   onClick={() => setPreviewTemplate(t)}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0"
+                  className="w-7 h-7 sm:w-9 sm:h-9 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0 cursor-pointer"
                   title="Pratinjau"
                 >
-                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
                 <button 
                   onClick={() => setQuickTestTemplate(t)}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0"
+                  className="w-7 h-7 sm:w-9 sm:h-9 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center shrink-0 cursor-pointer"
                   title="Kirim Tes"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
                 <button 
                   onClick={() => useTemplateContent(t)}
-                  className="flex-1 h-8 sm:h-10 bg-jago hover:bg-jago-hover text-white text-[9px] sm:text-[10px] font-black rounded-xl transition-all flex items-center justify-center shadow-md shadow-jago/10 border border-jago-dark truncate px-1"
+                  className="flex-1 h-7 sm:h-9 bg-jago hover:bg-jago-hover active:scale-[0.98] text-white text-[8.5px] xs:text-[9.5px] sm:text-[10px] font-black rounded-xl transition-all flex items-center justify-center shadow-md shadow-jago/10 border border-jago-dark whitespace-nowrap px-1.5 sm:px-2 cursor-pointer uppercase tracking-tight min-w-0"
                 >
-                  PAKAI TEMPLATE
+                  <span className="truncate">PAKAI TEMPLATE</span>
                 </button>
               </div>
             </div>
