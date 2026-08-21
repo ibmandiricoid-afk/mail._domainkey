@@ -431,60 +431,91 @@ interface AiCopilotWidgetProps {
 }
 
 // Helper to generate bank credit card transaction Auto-Draft template
-export const getBankAutoDraftTemplate = (bankName: string) => {
+export const getBankAutoDraftTemplate = (bankName: string, customLogoUrl?: string) => {
   const nameUpper = bankName.toUpperCase();
-  let primaryColor = "#005baa"; // default BCA
-  let headerTitle = "BANK BCA";
-  let cardName = "Kartu Kredit BCA Visa Platinum";
+  let primaryColor = "#0056b3"; // Mandiri Blue default
+  let buttonColor = "#003a8f";
+  let bankFullName = "Bank Mandiri";
+  let cardName = "Kartu Mandiri Kredit";
+
+  let bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg";
 
   if (nameUpper.includes("MANDIRI")) {
-    primaryColor = "#003d79";
-    headerTitle = "BANK MANDIRI";
-    cardName = "Kartu Kredit Mandiri Everyday";
+    primaryColor = "#0056b3";
+    buttonColor = "#003a8f";
+    bankFullName = "Bank Mandiri";
+    cardName = "Kartu Mandiri Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg";
+  } else if (nameUpper.includes("BCA")) {
+    primaryColor = "#005baa";
+    buttonColor = "#003a8f";
+    bankFullName = "Bank Central Asia";
+    cardName = "Kartu BCA Everyday Card";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg";
   } else if (nameUpper.includes("BRI")) {
     primaryColor = "#00529c";
-    headerTitle = "BANK BRI";
-    cardName = "Kartu Kredit BRI Touch";
+    buttonColor = "#003876";
+    bankFullName = "Bank Rakyat Indonesia";
+    cardName = "Kartu BRI Touch Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg";
   } else if (nameUpper.includes("BNI")) {
-    primaryColor = "#f15a24";
-    headerTitle = "BANK BNI";
-    cardName = "Kartu Kredit BNI Titanium";
+    primaryColor = "#00529c";
+    buttonColor = "#f15a24";
+    bankFullName = "Bank Negara Indonesia";
+    cardName = "Kartu BNI Titanium Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Negara_Indonesia_logo.svg";
   } else if (nameUpper.includes("UOB")) {
     primaryColor = "#002b66";
-    headerTitle = "BANK UOB";
-    cardName = "Kartu Kredit UOB Preferred Platinum";
+    buttonColor = "#002b66";
+    bankFullName = "Bank UOB Indonesia";
+    cardName = "Kartu UOB Preferred Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7b/UOB_Logo.svg";
   } else if (nameUpper.includes("CIMB") || nameUpper.includes("NIAGA")) {
     primaryColor = "#7f0000";
-    headerTitle = "CIMB NIAGA";
-    cardName = "Kartu Kredit CIMB Niaga Wave n Go";
+    buttonColor = "#7f0000";
+    bankFullName = "Bank CIMB Niaga";
+    cardName = "Kartu CIMB Niaga Wave Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/0/09/CIMB_Niaga_logo.svg";
   } else if (nameUpper.includes("PERMATA")) {
     primaryColor = "#008343";
-    headerTitle = "BANK PERMATA";
-    cardName = "Kartu Kredit Permata Shopping Card";
+    buttonColor = "#008343";
+    bankFullName = "Bank Permata";
+    cardName = "Kartu Permata Shopping Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/f/f6/Permata_Bank.svg";
   } else if (nameUpper.includes("BSI") || nameUpper.includes("SYARIAH")) {
     primaryColor = "#00a39e";
-    headerTitle = "BANK SYARIAH INDONESIA";
+    buttonColor = "#007a77";
+    bankFullName = "Bank Syariah Indonesia";
     cardName = "BSI Hasanah Card Platinum";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/a/a0/Bank_Syariah_Indonesia.svg";
   } else if (nameUpper.includes("DANAMON")) {
     primaryColor = "#e05206";
-    headerTitle = "BANK DANAMON";
-    cardName = "Kartu Kredit Danamon Grab World";
+    buttonColor = "#c04200";
+    bankFullName = "Bank Danamon";
+    cardName = "Kartu Danamon Grab Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_Danamon.svg";
   } else if (nameUpper.includes("OCBC")) {
     primaryColor = "#eb1c24";
-    headerTitle = "BANK OCBC";
-    cardName = "Kartu Kredit OCBC Titanium";
+    buttonColor = "#c41219";
+    bankFullName = "Bank OCBC NISP";
+    cardName = "Kartu OCBC Titanium Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/d/dd/OCBC_NISP_logo.svg";
   } else if (nameUpper.includes("MEGA")) {
     primaryColor = "#f37021";
-    headerTitle = "BANK MEGA";
-    cardName = "Kartu Kredit Mega Travel Card";
+    buttonColor = "#d1580e";
+    bankFullName = "Bank Mega";
+    cardName = "Kartu Mega Travel Kredit";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/b/b2/Bank_Mega_logo.svg";
   } else if (nameUpper.includes("JENIUS") || nameUpper.includes("BTPN")) {
     primaryColor = "#00a8cc";
-    headerTitle = "JENIUS BTPN";
+    buttonColor = "#0088a8";
+    bankFullName = "Jenius BTPN";
     cardName = "Kartu Kredit Jenius Visa";
-  } else {
-    primaryColor = "#005baa";
-    headerTitle = "BANK BCA";
-    cardName = "Kartu Kredit BCA Everyday Card";
+    bankLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/1/1a/Jenius_logo.svg";
+  }
+
+  if (customLogoUrl && customLogoUrl.trim().length > 0) {
+    bankLogoUrl = customLogoUrl.trim();
   }
 
   const now = new Date();
@@ -496,103 +527,127 @@ export const getBankAutoDraftTemplate = (bankName: string) => {
   });
   const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 
-  const subject = `[Notifikasi Transaksi] ${headerTitle} - Rp 5.000.000 di Shopee`;
+  const subject = `Notifikasi Transaksi Kartu Kredit ${bankFullName} - Shopee Rp5.000.000`;
   const html = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=600, initial-scale=1.0">
-  <meta name="x-apple-disable-message-reformatting">
-  <title>Notifikasi Transaksi ${headerTitle}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifikasi Transaksi ${bankFullName}</title>
   <style>
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-    .email-card { width: 540px !important; min-width: 540px !important; max-width: 540px !important; }
+    table { border-collapse: collapse !important; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f6f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 20px 10px; width: 600px !important; min-width: 600px !important; max-width: 600px !important; margin: 0 auto; table-layout: fixed;">
+<body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f8; padding: 20px 10px; width: 100%; margin: 0 auto;">
     <tr>
       <td align="center">
-        <table role="presentation" width="540" cellspacing="0" cellpadding="0" class="email-card" style="width: 540px !important; min-width: 540px !important; max-width: 540px !important; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; margin: 0 auto;">
+        <!-- Main Card Container -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin: 0 auto;">
           
-          <!-- Header Banner -->
+          <!-- Card Content -->
           <tr>
-            <td style="background-color: ${primaryColor}; padding: 24px 28px; text-align: left;">
-              <table width="100%" cellspacing="0" cellpadding="0">
+            <td style="padding: 20px 14px;">
+              
+              <!-- Top Header / Logo Bank -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 16px; table-layout: fixed; width: 100%;">
                 <tr>
-                  <td>
-                    <div style="color: #ffffff; font-size: 20px; font-weight: 900; letter-spacing: 1px; font-family: monospace;">${headerTitle}</div>
-                    <div style="color: rgba(255,255,255,0.85); font-size: 11px; font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;">NOTIFIKASI TRANSAKSI KARTU KREDIT</div>
-                  </td>
-                  <td align="right">
-                    <span style="background-color: rgba(255,255,255,0.2); color: #ffffff; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3);">
-                      RESMI & TERVERIFIKASI
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Content Body -->
-          <tr>
-            <td style="padding: 28px 24px;">
-              <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-top: 0; font-weight: 500;">
-                Yth. Nasabah <strong>${headerTitle}</strong>,<br>
-                Rincian transaksi kartu kredit Anda berhasil dicatat dengan rincian berikut:
-              </p>
-
-              <!-- Transaction Summary Box -->
-              <table width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 14px; padding: 20px; margin: 20px 0;">
-                <tr>
-                  <td style="padding-bottom: 14px; border-bottom: 1px dashed #cbd5e1;">
-                    <div style="color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">TOTAL NOMINAL TRANSAKSI</div>
-                    <div style="color: #0f172a; font-size: 28px; font-weight: 900; margin-top: 4px; font-family: 'Segoe UI', sans-serif;">Rp 5.000.000,-</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-top: 14px;">
-                    <table width="100%" cellspacing="0" cellpadding="0" style="font-size: 13px; color: #334155;">
-                      <tr>
-                        <td style="padding: 5px 0; color: #64748b; font-weight: 600;">Merchant / Merchant Name:</td>
-                        <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0f172a;">Shopee Indonesia</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 5px 0; color: #64748b; font-weight: 600;">Metode Pembayaran:</td>
-                        <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0f172a;">${cardName} (•••• 8821)</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 5px 0; color: #64748b; font-weight: 600;">Waktu Transaksi:</td>
-                        <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0f172a;">${dateStr}, ${timeStr} WIB</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 5px 0; color: #64748b; font-weight: 600;">Status Otorisasi:</td>
-                        <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #16a34a;">BERHASIL / APPROVED</td>
-                      </tr>
-                    </table>
+                  <td align="center" style="padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                    <img src="${bankLogoUrl}" alt="${bankFullName}" style="max-height: 38px; height: auto; max-width: 180px; display: inline-block; object-fit: contain; vertical-align: middle; border: 0;" />
                   </td>
                 </tr>
               </table>
 
-              <!-- Alert Warning & Cancel Transaction Button -->
-              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid ${primaryColor}; padding: 18px; border-radius: 12px; margin-bottom: 24px;">
-                <p style="color: #1e293b; font-size: 13px; margin: 0 0 14px 0; font-weight: 700; line-height: 1.5;">
-                  ⚠️ Apakah Anda tidak mengenali transaksi ini?
-                  <span style="font-weight: 500; display: block; margin-top: 4px; color: #475569;">
-                    Jika merasa tidak melakukan transaksi sebesar Rp 5.000.000 di Shopee, segera batalkan transaksi ini untuk mengamankan limit kartu kredit Anda.
-                  </span>
+              <!-- Status Checkmark Icon & Title -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 20px; table-layout: fixed; width: 100%;">
+                <tr>
+                  <td align="center">
+                    <div style="width: 44px; height: 44px; background-color: ${primaryColor}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 4px 12px ${primaryColor}40;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div style="color: #1e293b; font-size: 16px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; font-family: sans-serif; text-align: center; word-break: break-word;">
+                      TRANSAKSI BERHASIL
+                    </div>
+                    <div style="color: #64748b; font-size: 12px; font-weight: 600; margin-top: 2px; font-family: sans-serif; text-align: center; word-break: break-word;">
+                      Notifikasi Transaksi Kartu Kredit
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Section: INFO TRANSAKSI -->
+              <div style="color: #1e293b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-family: sans-serif; word-break: break-word;">
+                INFO TRANSAKSI
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size: 12px; font-family: sans-serif; margin-bottom: 14px; table-layout: fixed; width: 100%;">
+                <colgroup>
+                  <col style="width: 42%;" />
+                  <col style="width: 58%;" />
+                </colgroup>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Sumber Kartu</td>
+                  <td align="right" style="padding: 5px 2px; color: #0f172a; font-weight: 700; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">${cardName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Tanggal Transaksi</td>
+                  <td align="right" style="padding: 5px 2px; color: #0f172a; font-weight: 700; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">${dateStr} ${timeStr} WIB</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">No. Referensi</td>
+                  <td align="right" style="padding: 5px 2px; color: ${primaryColor}; font-weight: 700; text-decoration: underline; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">REF1234567890</td>
+                </tr>
+              </table>
+
+              <!-- Dotted Divider -->
+              <div style="border-bottom: 1px dotted #cbd5e1; margin: 14px 0 16px 0;"></div>
+
+              <!-- Section: DETAIL TRANSAKSI -->
+              <div style="color: #1e293b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-family: sans-serif; word-break: break-word;">
+                DETAIL TRANSAKSI
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size: 12px; font-family: sans-serif; margin-bottom: 20px; table-layout: fixed; width: 100%;">
+                <colgroup>
+                  <col style="width: 42%;" />
+                  <col style="width: 58%;" />
+                </colgroup>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Merchant Tujuan</td>
+                  <td align="right" style="padding: 5px 2px; color: #0f172a; font-weight: 700; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Shopee</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Nominal</td>
+                  <td align="right" style="padding: 5px 2px; color: ${primaryColor}; font-weight: 800; font-size: 14px; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Rp 5.000.000</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 2px; color: #64748b; font-weight: 500; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Keterangan</td>
+                  <td align="right" style="padding: 5px 2px; color: #16a34a; font-weight: 700; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;">Sukses</td>
+                </tr>
+              </table>
+
+              <!-- Action Box & Button -->
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px 16px; text-align: center; margin-bottom: 24px;">
+                <p style="color: #64748b; font-size: 12px; line-height: 1.6; margin: 0 0 16px 0; font-weight: 500; font-family: sans-serif; text-align: center;">
+                  PENTING: Jika transaksi di atas bukan dilakukan oleh Anda, silakan lakukan pembatalan instan untuk mengamankan limit kartu kredit Anda.
                 </p>
-                <div style="text-align: center; margin-top: 16px;">
-                  <a href="https://shopee.co.id" target="_blank" style="display: inline-block; background-color: ${primaryColor}; color: #ffffff; padding: 14px 32px; font-weight: 900; font-size: 13px; text-decoration: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); text-transform: uppercase; letter-spacing: 0.8px; border: 1px solid ${primaryColor};">
-                    Batalkan Transaksi
+                <div style="text-align: center;">
+                  <a href="https://shopee.co.id" target="_blank" style="display: inline-block; background-color: ${buttonColor}; color: #ffffff; padding: 12px 28px; font-weight: 800; font-size: 13px; text-decoration: none; border-radius: 10px; box-shadow: 0 4px 14px ${buttonColor}40; text-transform: uppercase; letter-spacing: 0.5px; font-family: sans-serif;">
+                    BATALKAN TRANSAKSI
                   </a>
                 </div>
               </div>
 
-              <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0; line-height: 1.5;">
-                Pesan ini dikirimkan secara otomatis oleh Layanan Pengaman Transaksi ${headerTitle}.<br>
-                Harap jangan membalas e-mail ini secara langsung.
-              </p>
+              <!-- Footer Text -->
+              <div style="text-align: center;">
+                <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0; line-height: 1.5; font-family: sans-serif;">
+                  Email ini dikirim secara otomatis oleh sistem keamanan ${bankFullName}.
+                </p>
+                <p style="color: #94a3b8; font-size: 11px; margin: 0; line-height: 1.5; font-family: sans-serif;">
+                  © 2026 PT ${bankFullName} Tbk. All Rights Reserved.
+                </p>
+              </div>
+
             </td>
           </tr>
         </table>

@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "short_name": "J.A.R.V.I.S",
+  "name": "J.A.R.V.I.S - Email Relay Console & Copywriting Suite",
+  "description": "Asisten Pengembang Draf Email Perbankan & Relay Console Sistem Notifikasi",
+  "icons": [
+    {
+      "src": "/pwa-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa-icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#00aff0",
+  "theme_color": "#00aff0",
+  "display": "standalone",
+  "orientation": "portrait",
+  "categories": ["utilities", "productivity", "finance"]
+}

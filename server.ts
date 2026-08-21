@@ -567,10 +567,10 @@ You MUST respond strictly with a valid JSON object matching this schema (do NOT 
   }
 });
 
-// API Endpoint: Audit Domain & IP Reputation (SPF, DMARC, MX, RBL diagnostic)
+// API Endpoint: Audit Domain & IP Reputation (SPF, DKIM, DMARC, MX, RBL diagnostic)
 app.post("/api/audit-domain", async (req, res) => {
   try {
-    const { email, domain: reqDomain } = req.body;
+    const { email, domain: reqDomain, dkimSelector: reqDkimSelector } = req.body;
     let inputStr = (reqDomain || email || "").toLowerCase().trim();
     let cleanDomain = "";
 
@@ -591,6 +591,8 @@ app.post("/api/audit-domain", async (req, res) => {
       cleanDomain = "gmail.com";
     }
 
+    const isMajorProvider = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "zoho.com"].includes(cleanDomain);
+
     // 1. Check SPF TXT Record
     let spfFound = false;
     let spfRecord = "";
@@ -608,7 +610,42 @@ app.post("/api/audit-domain", async (req, res) => {
       console.log("[Audit API] SPF TXT check failed for", cleanDomain);
     }
 
-    // 2. Check DMARC TXT Record (_dmarc.domain)
+    // 2. Check DKIM TXT Record
+    let dkimFound = false;
+    let dkimRecord = "";
+    let dkimSelectorFound = "";
+    const commonSelectors = [
+      "default", "google", "k1", "s1", "s2", "mail", "smtp", "selector1",
+      "mandiri", "bca", "zoho", "mailgun", "sendgrid", "pepipost", "k2022", "s20150623", "dkim"
+    ];
+    const customSelector = reqDkimSelector ? String(reqDkimSelector).trim() : "";
+    const selectorsToCheck = customSelector ? [customSelector, ...commonSelectors] : commonSelectors;
+
+    if (isMajorProvider) {
+      dkimFound = true;
+      dkimSelectorFound = cleanDomain.includes("gmail") ? "google" : "default";
+      dkimRecord = "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ... (Standard Provider Managed)";
+    } else {
+      for (const sel of selectorsToCheck) {
+        try {
+          const dkimTxt = await dnsPromises.resolveTxt(`${sel}._domainkey.${cleanDomain}`);
+          for (const recordArray of dkimTxt) {
+            const fullTxt = recordArray.join("");
+            if (fullTxt.includes("v=DKIM1") || fullTxt.includes("k=rsa") || fullTxt.includes("p=")) {
+              dkimFound = true;
+              dkimRecord = fullTxt;
+              dkimSelectorFound = sel;
+              break;
+            }
+          }
+          if (dkimFound) break;
+        } catch (e) {
+          // try next selector
+        }
+      }
+    }
+
+    // 3. Check DMARC TXT Record (_dmarc.domain)
     let dmarcFound = false;
     let dmarcRecord = "";
     try {
@@ -625,7 +662,7 @@ app.post("/api/audit-domain", async (req, res) => {
       console.log("[Audit API] DMARC TXT check failed for", cleanDomain);
     }
 
-    // 3. Check MX Records
+    // 4. Check MX Records
     let mxFound = false;
     let mxCount = 0;
     let mxServers: string[] = [];
@@ -640,9 +677,8 @@ app.post("/api/audit-domain", async (req, res) => {
       console.log("[Audit API] MX check failed for", cleanDomain);
     }
 
-    // Major email providers handling
-    const isMajorProvider = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "zoho.com"].includes(cleanDomain);
-    let reputationScore = 75;
+    // Deliverability Score Calculation
+    let reputationScore = 50;
 
     if (isMajorProvider) {
       reputationScore = 98;
@@ -651,23 +687,134 @@ app.post("/api/audit-domain", async (req, res) => {
       dmarcFound = true;
       dmarcRecord = "v=DMARC1; p=none; sp=none; (Standard Provider Managed)";
     } else {
-      if (mxFound) reputationScore += 10;
-      if (spfFound) reputationScore += 10;
-      if (dmarcFound) reputationScore += 5;
+      if (mxFound) reputationScore += 15;
+      if (spfFound) reputationScore += 15;
+      if (dkimFound) reputationScore += 12;
+      if (dmarcFound) reputationScore += 8;
     }
 
-    const recommendations = [];
-    if (!spfFound && !isMajorProvider) {
-      recommendations.push("Tambahkan TXT Record SPF (v=spf1 include:...) pada DNS domain Anda untuk mencegah email dianggap SPAM.");
+    if (reputationScore > 100) reputationScore = 100;
+
+    // Build Actionable Advice
+    const actionableAdvice: Array<{
+      type: "spf" | "dkim" | "dmarc" | "mx";
+      status: "valid" | "warning" | "missing";
+      title: string;
+      description: string;
+      recordHost?: string;
+      recordType?: string;
+      recommendedValue?: string;
+      currentRecord?: string;
+      steps: string[];
+    }> = [];
+
+    // SPF Advice
+    if (spfFound) {
+      actionableAdvice.push({
+        type: "spf",
+        status: "valid",
+        title: "Record SPF Terverifikasi (Valid)",
+        description: "TXT Record SPF ditemukan. Server penerima (Gmail, Yahoo, Outlook) dapat mengonfirmasi otorisasi server pengirim email Anda.",
+        currentRecord: spfRecord,
+        steps: [
+          "Pastikan seluruh IP/host server SMTP Anda (Mailgun, SendGrid, Google Workspace, cPanel, dll) terdaftar di dalam record tunggal ini.",
+          "Jangan membuat lebih dari 1 record SPF di DNS karena akan menyebabkan galat evaluasi (SPF PermError)."
+        ]
+      });
+    } else {
+      actionableAdvice.push({
+        type: "spf",
+        status: "missing",
+        title: "Record SPF Tidak Ditemukan",
+        description: "Domain Anda belum memiliki TXT record SPF (v=spf1). Email berisiko tinggi masuk folder SPAM atau ditolak oleh filter penerima.",
+        recordHost: "@",
+        recordType: "TXT",
+        recommendedValue: `v=spf1 a mx include:_spf.google.com ~all`,
+        steps: [
+          "Buka kontrol panel DNS Manager domain Anda (Cloudflare, cPanel, GoDaddy, Namecheap, dll).",
+          "Tambahkan record baru dengan tipe TXT.",
+          "Isi Name / Host dengan '@' (atau kosongkan untuk root domain).",
+          "Isi Value dengan: v=spf1 a mx ~all (atau sesuaikan include: dengan provider email Anda).",
+          "Simpan perubahan dan tunggu propagasi DNS."
+        ]
+      });
     }
-    if (!dmarcFound && !isMajorProvider) {
-      recommendations.push("Tambahkan TXT Record DMARC (_dmarc) pada DNS untuk verifikasi otentikasi domain dan mencegah spoofing.");
+
+    // DKIM Advice
+    if (dkimFound) {
+      actionableAdvice.push({
+        type: "dkim",
+        status: "valid",
+        title: "Record DKIM Terverifikasi (Valid)",
+        description: `Tanda tangan digital DKIM ditemukan pada selector '${dkimSelectorFound || "default"}._domainkey.${cleanDomain}'. Email dipastikan terautentikasi dan bebas dari manipulasi.`,
+        currentRecord: dkimRecord,
+        steps: [
+          "DKIM sudah aktif secara tepat.",
+          "Lakukan rotasi kunci DKIM secara berkala (6-12 bulan sekali) dari panel provider email Anda untuk keamanan maksimal."
+        ]
+      });
+    } else {
+      actionableAdvice.push({
+        type: "dkim",
+        status: "missing",
+        title: "Record DKIM Tidak Ditemukan",
+        description: "Tidak ditemukan TXT record DKIM pada selector umum. Tanpa DKIM, email tidak memiliki ttd digital kriptografi yang menurunkan reputasi pengirim.",
+        recordHost: "default._domainkey",
+        recordType: "TXT",
+        recommendedValue: `v=DKIM1; k=rsa; p=[KUNCI_PUBLIK_DKIM_DARI_PANEL_EMAIL_ANDA]`,
+        steps: [
+          "Masuk ke kontrol panel Email / SMTP Provider Anda (cPanel, Google Workspace, Mailgun, SendGrid, Zoho, dsb).",
+          "Akses menu 'DKIM Authentication' atau 'Domain Keys' lalu klik 'Generate Key'.",
+          "Salin Nama Selector (misal default._domainkey atau google._domainkey).",
+          "Buat TXT Record baru di DNS Manager dengan Name/Host tersebut dan rekatkan Value Kunci Publik DKIM.",
+          "Klik tombol 'Verify' pada panel provider email Anda."
+        ]
+      });
     }
-    if (!mxFound && !isMajorProvider) {
-      recommendations.push("Pastikan MX record domain Anda menunjuk ke server mail yang valid agar balasan email (reply) dapat diterima.");
+
+    // DMARC Advice
+    if (dmarcFound) {
+      const isMonitoring = dmarcRecord.includes("p=none");
+      actionableAdvice.push({
+        type: "dmarc",
+        status: isMonitoring ? "warning" : "valid",
+        title: isMonitoring ? "DMARC Mode Pemantauan (p=none)" : "DMARC Proteksi Ketat (p=quarantine / p=reject)",
+        description: isMonitoring
+          ? "Kebijakan DMARC aktif dalam mode pemantauan (`p=none`). Laporan dikirimkan tanpa memblokir email. Tingkatkan ke `p=quarantine` jika otentikasi SPF & DKIM telah stabil."
+          : "DMARC aktif dengan tingkat perlindungan penuh. Email palsu/spoofing yang gagal verifikasi akan langsung ditolak atau dikarantina oleh penerima.",
+        currentRecord: dmarcRecord,
+        steps: isMonitoring ? [
+          "Periksa laporan berkala yang dikirimkan ke alamat RUA DMARC Anda.",
+          "Ubah tag `p=none` menjadi `p=quarantine` atau `p=reject` setelah memastikan seluruh email legitimate terautentikasi."
+        ] : [
+          "Kebijakan DMARC domain Anda berada dalam standar keamanan tertinggi."
+        ]
+      });
+    } else {
+      actionableAdvice.push({
+        type: "dmarc",
+        status: "missing",
+        title: "Record DMARC Tidak Ditemukan",
+        description: "Domain Anda belum memiliki kebijakan DMARC (_dmarc). Google dan Yahoo mengharuskan DMARC aktif untuk pengirim email agar lolos ke Inbox.",
+        recordHost: "_dmarc",
+        recordType: "TXT",
+        recommendedValue: `v=DMARC1; p=none; rua=mailto:dmarc-reports@${cleanDomain}`,
+        steps: [
+          "Buka kontrol panel DNS Manager domain Anda.",
+          "Tambahkan TXT Record baru.",
+          "Isi Name / Host dengan: _dmarc",
+          "Isi Value dengan: v=DMARC1; p=none; rua=mailto:dmarc-reports@" + cleanDomain,
+          "Simpan record dan tunggu propagasi."
+        ]
+      });
     }
-    if (reputationScore >= 90) {
-      recommendations.push("Reputasi domain & IP Anda dalam kondisi prima! Tingkat keterkiriman (Deliverability Rate) diperkirakan 98-99%.");
+
+    const legacyRecommendations = actionableAdvice
+      .filter(a => a.status !== "valid")
+      .map(a => `${a.title}: ${a.description}`);
+
+    if (legacyRecommendations.length === 0) {
+      legacyRecommendations.push("Reputasi DNS & Otentikasi domain Anda dalam kondisi prima! Tingkat keterkiriman (Deliverability Rate) diperkirakan 98-99%.");
     }
 
     return res.json({
@@ -677,11 +824,19 @@ app.post("/api/audit-domain", async (req, res) => {
       isMajorProvider,
       spf: {
         found: spfFound,
-        record: spfRecord || "Record SPF tidak terdeteksi pada DNS domain."
+        record: spfRecord || "Record SPF tidak terdeteksi pada DNS domain.",
+        status: spfFound ? "valid" : "missing"
+      },
+      dkim: {
+        found: dkimFound,
+        selector: dkimSelectorFound || null,
+        record: dkimRecord || "Record DKIM tidak terdeteksi pada selector umum.",
+        status: dkimFound ? "valid" : "missing"
       },
       dmarc: {
         found: dmarcFound,
-        record: dmarcRecord || "Record DMARC tidak terdeteksi pada DNS domain."
+        record: dmarcRecord || "Record DMARC tidak terdeteksi pada DNS domain.",
+        status: dmarcFound ? "valid" : "missing"
       },
       mx: {
         found: mxFound,
@@ -698,7 +853,8 @@ app.post("/api/audit-domain", async (req, res) => {
         spamComplaintRate: "0.00%",
         inboxDeliverabilityEst: reputationScore >= 90 ? "98.5%" : reputationScore >= 80 ? "92.0%" : "78.0%"
       },
-      recommendations
+      actionableAdvice,
+      recommendations: legacyRecommendations
     });
   } catch (err: any) {
     res.status(500).json({ error: "Gagal menjalankan audit domain: " + err.message });

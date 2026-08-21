@@ -185,7 +185,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
   };
 
   return (
-    <div className="w-full h-full flex flex-col border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-inner ring-1 ring-slate-100">
+    <div className="rich-text-editor-container w-full h-full flex flex-col border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-inner ring-1 ring-slate-100">
       {/* Toolbar */}
       <div className="flex items-center justify-between p-1.5 bg-slate-50 border-b border-slate-200 select-none overflow-hidden">
         {!isHtmlMode ? (
@@ -474,7 +474,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
           </div>
         )}
         {!isHtmlMode ? (
-          <div className="w-full max-w-[480px] mx-auto flex flex-col items-center">
+          <div className="w-full max-w-full mx-auto flex flex-col items-center overflow-x-hidden">
             <div
               ref={editorRef}
               contentEditable
@@ -483,7 +483,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
               onKeyUp={handleEditorInteract}
               onMouseUp={handleEditorInteract}
               onFocus={handleEditorInteract}
-              className="bg-white p-3 sm:p-3.5 shadow-xs rounded-xl border border-slate-200/90 text-slate-800 text-sm focus:outline-none leading-relaxed select-text w-full max-w-[480px] box-border overflow-x-hidden"
+              className="bg-white p-2 sm:p-3.5 shadow-xs rounded-xl border border-slate-200/90 text-slate-800 text-sm focus:outline-none leading-relaxed select-text w-full max-w-full box-border overflow-x-hidden"
               style={{ 
                 minHeight
               }}
@@ -491,19 +491,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
             />
           </div>
         ) : (
-          <div className="w-full max-w-[480px] mx-auto flex flex-col items-center">
+          <div className="w-full max-w-full mx-auto flex flex-col items-center overflow-x-hidden">
             <textarea
               value={htmlValue}
               onChange={handleHtmlChange}
               placeholder={placeholder}
-              className="w-full h-full min-h-[inherit] max-w-[480px] p-3 text-slate-100 text-xs font-mono focus:outline-none bg-[#040914] resize-none leading-relaxed tracking-wide rounded-xl border border-slate-800 shadow-xs"
+              className="w-full h-full min-h-[inherit] max-w-full p-2.5 text-slate-100 text-xs font-mono focus:outline-none bg-[#040914] resize-none leading-relaxed tracking-wide rounded-xl border border-slate-800 shadow-xs box-border overflow-x-hidden"
               style={{ minHeight }}
             />
           </div>
         )}
       </div>
 
-      {/* Styles to support placeholder on contenteditable and scrollbar hiding */}
+      {/* Styles to support placeholder on contenteditable, box auto-fit, and scrollbar hiding */}
       <style>{`
         /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar {
@@ -519,66 +519,102 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = React.memo(({
           color: #94a3b8;
           cursor: text;
         }
+        /* Strict Box Fitting & Anti-Overflow Rules for Email Draft Editor */
+        .rich-text-editor-container {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
         [contenteditable] {
           outline: none;
           box-sizing: border-box !important;
           width: 100% !important;
           max-width: 100% !important;
+          overflow-x: hidden !important;
+          word-break: break-word !important;
+          overflow-wrap: anywhere !important;
+          display: flex;
+          flex-direction: column;
+          margin: 0 !important;
         }
         /* Universal responsive scaling for all inner template elements */
-        [contenteditable] * {
+        [contenteditable] *,
+        [contenteditable] table,
+        [contenteditable] tbody,
+        [contenteditable] tr,
+        [contenteditable] td,
+        [contenteditable] div,
+        [contenteditable] p,
+        [contenteditable] span {
           box-sizing: border-box !important;
           max-width: 100% !important;
         }
         /* Ensure email tables, containers, and elements fit symmetrically inside preview box */
         [contenteditable] table {
-          max-width: 100% !important;
           width: 100% !important;
+          max-width: 100% !important;
           margin-left: auto !important;
           margin-right: auto !important;
-          box-sizing: border-box !important;
           border-collapse: collapse !important;
-          table-layout: auto !important;
+          table-layout: fixed !important;
         }
-        [contenteditable] img {
+        [contenteditable] td,
+        [contenteditable] th {
+          max-width: 100% !important;
+          word-break: break-word !important;
+          overflow-wrap: anywhere !important;
+          white-space: normal !important;
+        }
+        [contenteditable] img,
+        [contenteditable] video,
+        [contenteditable] svg {
           max-width: 100% !important;
           height: auto !important;
-          margin-left: auto !important;
-          margin-right: auto !important;
-          display: block !important;
+          object-fit: contain !important;
+          display: inline-block !important;
+          vertical-align: middle !important;
+          margin: 0 auto !important;
         }
-        [contenteditable] div, 
-        [contenteditable] section, 
-        [contenteditable] td,
-        [contenteditable] th,
-        [contenteditable] p {
+        [contenteditable] a {
           max-width: 100% !important;
           box-sizing: border-box !important;
-          overflow-wrap: break-word !important;
+          overflow-wrap: anywhere !important;
           word-break: break-word !important;
         }
-        /* Prevent excessive nested padding on small mobile viewports */
+        /* Mobile specific fixes to ensure tables inside contenteditable fit without cutting off or scrolling */
         @media (max-width: 640px) {
-          [contenteditable] td {
-            padding-left: 8px !important;
-            padding-right: 8px !important;
+          [contenteditable] {
+            padding: 6px 4px !important;
           }
-          [contenteditable] table.main-card,
-          [contenteditable] .main-card {
+          [contenteditable] table {
             width: 100% !important;
             max-width: 100% !important;
-            border-radius: 8px !important;
+            table-layout: fixed !important;
+          }
+          [contenteditable] td {
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+          }
+          [contenteditable] table[role="presentation"] {
+            padding: 4px 2px !important;
           }
         }
         /* Style standard tag output for consistent contenteditable visual representation */
         [contenteditable] ul {
           list-style-type: disc !important;
-          padding-left: 24px !important;
+          padding-left: 20px !important;
           margin: 8px 0 !important;
         }
         [contenteditable] ol {
           list-style-type: decimal !important;
-          padding-left: 24px !important;
+          padding-left: 20px !important;
           margin: 8px 0 !important;
         }
         [contenteditable] blockquote {

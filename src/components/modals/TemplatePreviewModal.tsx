@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Send, ExternalLink } from "lucide-react";
 import { EmailTemplate } from "../../types";
@@ -15,10 +16,12 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
   setPreviewTemplate,
   setActiveTab,
 }) => {
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {previewTemplate && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto left-0 top-0 right-0 bottom-0 w-full h-full max-w-full">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -71,7 +74,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
               })()}
             </div>
 
-            <div className="flex-1 overflow-hidden p-4 bg-slate-100 flex flex-col min-h-[380px]">
+            <div className="flex-1 overflow-hidden p-2 sm:p-4 bg-slate-100 flex flex-col min-h-[360px] w-full max-w-full">
               <iframe
                 title="Real Template Preview"
                 srcDoc={`
@@ -79,8 +82,11 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
                   <html>
                     <head>
                       <meta charset="utf-8">
-                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                       <style>
+                        * {
+                          box-sizing: border-box !important;
+                        }
                         html, body {
                           margin: 0;
                           padding: 0;
@@ -91,10 +97,21 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
                           color: #333333;
                           overflow-x: hidden !important;
                           position: relative;
+                          word-break: break-word;
+                          overflow-wrap: anywhere;
                         }
-                        img {
-                          max-width: 100%;
-                          height: auto;
+                        img, video, svg {
+                          max-width: 100% !important;
+                          height: auto !important;
+                          object-fit: contain;
+                        }
+                        table {
+                          max-width: 100% !important;
+                          table-layout: fixed !important;
+                        }
+                        td, th {
+                          word-break: break-word !important;
+                          overflow-wrap: anywhere !important;
                         }
                       </style>
                     </head>
@@ -110,50 +127,23 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 
                           var wrapper = document.createElement('div');
                           wrapper.id = 'email-wrapper';
-                          wrapper.style.width = '600px';
-                          wrapper.style.position = 'absolute';
-                          wrapper.style.left = '50%';
-                          wrapper.style.top = '0';
-                          wrapper.style.transformOrigin = 'top center';
+                          wrapper.style.width = '100%';
+                          wrapper.style.maxWidth = '600px';
+                          wrapper.style.margin = '0 auto';
                           wrapper.style.boxSizing = 'border-box';
+                          wrapper.style.display = 'flex';
+                          wrapper.style.flexDirection = 'column';
                           
                           while (document.body.firstChild) {
                             wrapper.appendChild(document.body.firstChild);
                           }
                           document.body.appendChild(wrapper);
-                          
-                          function adjustScale() {
-                            var viewportWidth = window.innerWidth;
-                            var targetWidth = viewportWidth - 16;
-                            if (targetWidth < 280) targetWidth = viewportWidth;
-                            var scale = targetWidth / 600;
-                              
-                            if (scale < 1) {
-                              wrapper.style.transform = 'translateX(-50%) scale(' + scale + ')';
-                              document.body.style.height = (wrapper.offsetHeight * scale + 24) + 'px';
-                            } else {
-                              wrapper.style.transform = 'translateX(-50%)';
-                              document.body.style.height = (wrapper.offsetHeight + 24) + 'px';
-                            }
-                          }
-                          
-                          window.addEventListener('resize', adjustScale);
-                          window.addEventListener('load', adjustScale);
-                          
-                          if (typeof ResizeObserver !== 'undefined') {
-                            var ro = new ResizeObserver(adjustScale);
-                            ro.observe(wrapper);
-                          }
-                          
-                          setTimeout(adjustScale, 50);
-                          setTimeout(adjustScale, 200);
-                          setTimeout(adjustScale, 500);
                         });
                       </script>
                     </body>
                   </html>
                 `}
-                className="w-full flex-1 border-0 rounded-2xl bg-white shadow-inner"
+                className="w-full flex-1 border-0 rounded-2xl bg-white shadow-inner max-w-full"
                 sandbox="allow-popups allow-scripts"
               />
             </div>
@@ -179,6 +169,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

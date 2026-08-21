@@ -269,7 +269,7 @@ export const CancelTransactionLinkForm: React.FC<CancelTransactionLinkFormProps>
         <label className="text-[8.5px] sm:text-[9px] font-black text-slate-500 uppercase tracking-wider block mb-1">
           PILIH MEREK BANK (WARNA TOMBOL DINAMIS)
         </label>
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 pb-1">
+        <div className="flex flex-wrap gap-1.5 py-1 max-w-full">
           {BANK_BRAND_PRESETS.map((preset) => {
             const isSelected = preset.color.toLowerCase() === selectedColor.toLowerCase();
             return (
@@ -278,9 +278,9 @@ export const CancelTransactionLinkForm: React.FC<CancelTransactionLinkFormProps>
                 type="button"
                 onClick={() => handleSelectBankPreset(preset.color)}
                 className={hn(
-                  "shrink-0 px-2 sm:px-2.5 py-1 rounded-lg text-[9px] sm:text-[9.5px] font-bold transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs",
+                  "shrink-0 px-2.5 py-1 rounded-lg text-[9.5px] font-bold transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs",
                   isSelected
-                    ? "bg-slate-900 text-white border-slate-900 ring-2 ring-slate-400"
+                    ? "bg-slate-900 text-white border-slate-900 ring-1 ring-slate-400"
                     : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
                 )}
               >

@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { 
   Info, Loader2, Sparkles, AlertTriangle, CheckCircle, Mail, ShieldCheck, Check, X,
   Compass, Lock, Cloud, LogOut, Key, FileSignature, Eye, Code, ChevronDown, ChevronUp,
-  TrendingUp, Globe, Activity, Flame, RotateCcw, Calendar, Sliders, Camera
+  TrendingUp, Globe, Activity, Flame, RotateCcw, Calendar, Sliders
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SmtpConfig } from "../types";
 import { hn } from "../lib/utils";
-import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
 import { SecurityRadarScanner } from "./SecurityRadarScanner";
 
 interface AccountsTabProps {
@@ -740,61 +739,20 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
 
             <hr className="border-slate-100" />
 
-            {/* FORM 1: NAMA PENGIRIM (FROM NAME) & FOTO PROFIL */}
+            {/* FORM 1: NAMA PENGIRIM (FROM NAME) */}
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                <label 
-                  className="relative shrink-0 cursor-pointer group/avatar rounded-2xl overflow-hidden border-2 border-dashed border-sky-400 hover:border-sky-500 bg-slate-900 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center p-0.5 hover:ring-2 hover:ring-sky-300 transition-all shadow-md"
-                  title="Klik untuk mengubah foto profile/avatar pengirim"
-                >
-                  <img 
-                    src={smtpConfig.sendingAvatarUrl || defaultAvatarImg} 
-                    alt="Foto Profil Pengirim" 
-                    onError={(e) => { e.currentTarget.src = defaultAvatarImg; }}
-                    className="w-full h-full object-cover rounded-xl group-hover/avatar:scale-105 transition-transform"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
-                    <Camera className="w-5 h-5 text-white drop-shadow-sm" />
-                  </div>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (evt) => {
-                          const result = evt.target?.result as string;
-                          if (result) {
-                            setSmtpConfig(prev => ({ ...prev, sendingAvatarUrl: result }));
-                            addLog("success", "Foto profil pengiriman email berhasil diperbarui!");
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
+              <div className="flex flex-col gap-1.5 min-w-0">
+                <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
+                  <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  Nama Pengirim (From Name)
                 </label>
-
-                <div className="flex-1 w-full flex flex-col gap-1.5 min-w-0">
-                  <div className="flex justify-between items-center gap-2 flex-wrap">
-                    <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
-                      <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                      Nama Pengirim (From Name)
-                    </label>
-                    <span className="text-[8.5px] sm:text-[9px] font-bold text-sky-600">
-                      Klik foto untuk ganti avatar
-                    </span>
-                  </div>
-                  <input 
-                    type="text" 
-                    value={smtpConfig.fromName || ""}
-                    onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
-                    placeholder=""
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
-                  />
-                </div>
+                <input 
+                  type="text" 
+                  value={smtpConfig.fromName || ""}
+                  onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
+                  placeholder=""
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
+                />
               </div>
 
               {/* FORM 2 & 3: EMAIL & PASSWORD */}

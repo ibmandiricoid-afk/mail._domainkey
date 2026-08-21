@@ -5,7 +5,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RichTextEditor } from "./RichTextEditor";
-import { CancelTransactionLinkForm } from "./CancelTransactionLinkForm";
 import { EmailTemplate, SmtpConfig, SpamReport, EmailValidationRecord } from "../types";
 import { hn, isValidEmail, getEmailTypoFix } from "../lib/utils";
 import defaultAvatarImg from "../assets/images/sending_avatar.jpg";
@@ -1192,24 +1191,14 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                       )}
                     </div>
 
-                    <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+                    <div className="flex-1 min-h-0 flex flex-col gap-1.5 w-full max-w-full overflow-hidden">
                       <RichTextEditor 
                         value={emailForm.message}
                         onChange={handleMessageChange}
                         placeholder="Tulis pesan email di sini atau gunakan AI / Template..."
-                        minHeight="120px"
+                        minHeight="140px"
                       />
                     </div>
-
-                    {/* Cancel Transaction Link Form with Dynamic Bank Brand Selector */}
-                    {emailForm.message && /batal|cancel|pembatalan|laporkan|fraud|tolak/i.test(emailForm.message) && (
-                      <div className="shrink-0 pt-1">
-                        <CancelTransactionLinkForm
-                          html={emailForm.message}
-                          onUpdateHtml={(newHtml) => setEmailForm(prev => ({ ...prev, message: newHtml }))}
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -1230,9 +1219,9 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
                             key={t.id}
                             type="button"
                             onClick={() => useTemplateContent(t)}
-                            className="shrink-0 group flex flex-col items-start p-2 bg-slate-50 border border-slate-200/90 rounded-xl hover:bg-slate-100 hover:border-jago transition-all shadow-xs active:scale-95 w-[110px] sm:w-[130px] cursor-pointer"
+                            className="shrink-0 group flex flex-col items-start justify-between p-2.5 bg-slate-50 border border-slate-200/90 rounded-xl hover:bg-slate-100 hover:border-jago transition-all shadow-xs active:scale-95 w-[115px] sm:w-[135px] aspect-[2/1] cursor-pointer"
                           >
-                            <span className="text-[9.5px] sm:text-[10px] font-black text-slate-800 group-hover:text-jago-dark truncate w-full text-left">
+                            <span className="text-[9.5px] sm:text-[10px] font-black text-slate-800 group-hover:text-jago-dark line-clamp-1 w-full text-left leading-tight break-words">
                               {t.name}
                             </span>
                             <span className="text-[7.5px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-tight truncate w-full text-left">

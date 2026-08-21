@@ -3,7 +3,7 @@ import {
   KeyRound, 
   LogOut, 
   ChevronLeft, 
-  Sparkles, 
+  Sparkles 
 } from "lucide-react";
 import { SendTab } from "./components/SendTab";
 import { TemplatesTab } from "./components/TemplatesTab";
@@ -11,13 +11,16 @@ import { TerminalTab } from "./components/TerminalTab";
 import { AccountsTab, ZohoSmtpIcon } from "./components/AccountsTab";
 import { AppBottomNav } from "./components/AppBottomNav";
 import { NotificationToastStack } from "./components/NotificationToastStack";
-import { AiCopilotWidget } from "./components/AiCopilotWidget";
+import { AiCopilotWidget, getBankAutoDraftTemplate } from "./components/AiCopilotWidget";
 import { LoginView } from "./components/LoginView";
 import { TemplateFormModal } from "./components/modals/TemplateFormModal";
 import { TemplatePreviewModal } from "./components/modals/TemplatePreviewModal";
 import { DeleteConfirmModal } from "./components/modals/DeleteConfirmModal";
 import { QuickTestModal } from "./components/modals/QuickTestModal";
 import { PasscodeModal } from "./components/modals/PasscodeModal";
+import { PwaInstallPrompt } from "./components/PwaInstallPrompt";
+import { useCelebration, ConfettiParticle } from "./hooks/useCelebration";
+import { useNotification } from "./hooks/useNotification";
 import { hn } from "./lib/utils";
 import { motion } from "motion/react";
 
@@ -25,27 +28,12 @@ import { motion } from "motion/react";
 import { 
   SmtpConfig, 
   EmailTemplate, 
-  LogEntry, 
-  BankingNotification, 
-  EmailValidationRecord 
+  LogEntry,
+  EmailValidationRecord
 } from "./types";
 
 export type TabType = "send" | "templates" | "terminal" | "accounts";
-
-export interface ConfettiParticle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  color: string;
-  shape: "circle" | "square" | "triangle";
-  rotate: number;
-  rotateSpeed: number;
-  delay: number;
-  duration: number;
-}
+export type { ConfettiParticle };
 
 // Background asset
 import jarvisBg from "./assets/images/jarvis_cool_background_1783882128944.jpg";
@@ -63,8 +51,6 @@ const DEFAULT_SMTP: SmtpConfig = {
   connectionType: "SSL",
   logoUrl: "",
 };
-
-const DEFAULT_TEMPLATES: EmailTemplate[] = [];
 
 export default function App() {
   // --- Auth State ---
@@ -123,13 +109,37 @@ export default function App() {
 
   const [templates, setTemplates] = useState<EmailTemplate[]>(() => {
     const saved = localStorage.getItem("jarvis_email_templates");
-    if (!saved) return [];
-    try {
-      const parsed: EmailTemplate[] = JSON.parse(saved);
-      return parsed.filter((t) => t.id !== "tpl_1" && t.id !== "tpl_2");
-    } catch {
-      return [];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch {
+        // ignore JSON parse error
+      }
     }
+    // Default initial templates only if never set in localStorage before
+    const defaultBca = getBankAutoDraftTemplate("BCA");
+    const defaultMandiri = getBankAutoDraftTemplate("Mandiri");
+    return [
+      {
+        id: "tpl_bca_default",
+        name: "Notifikasi Transaksi Kartu Kredit BCA",
+        category: "General",
+        subject: defaultBca.subject,
+        message: defaultBca.html,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: "tpl_mandiri_default",
+        name: "Notifikasi Transaksi Kartu Kredit Mandiri",
+        category: "General",
+        subject: defaultMandiri.subject,
+        message: defaultMandiri.html,
+        createdAt: new Date().toISOString()
+      }
+    ];
   });
 
   const [logs, setLogs] = useState<LogEntry[]>(() => {
@@ -143,17 +153,14 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // --- Bank-grade Toast Notification System ---
-  const [bankingNotifications, setBankingNotifications] = useState<BankingNotification[]>([]);
-
-  // --- Confetti Animation Particles ---
-  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
-  const [showConfetti, setShowConfetti] = useState(false);
+  // --- Custom Hooks for Toast Notifications & Celebration Confetti ---
+  const { bankingNotifications, setBankingNotifications } = useNotification();
+  const { confettiParticles, showConfetti, triggerConfetti } = useCelebration();
 
   // --- Modals State ---
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [templateForm, setTemplateForm] = useState<{
+    id?: string;
     name: string;
     category: "Support" | "Marketing" | "General" | "Personal";
     subject: string;
@@ -307,40 +314,6 @@ export default function App() {
     }, 1500);
   };
 
-  // Trigger Celebration Confetti
-  const triggerConfetti = useCallback(() => {
-    const colors = ["#00a8ff", "#00d2d3", "#ff9f43", "#10ac84", "#5f27cd", "#ff6b6b", "#e1b12c"];
-    const shapes: ("circle" | "square" | "triangle")[] = ["circle", "square", "triangle"];
-
-    const newParticles: ConfettiParticle[] = Array.from({ length: 45 }).map((_, i) => ({
-      id: i,
-      x: 50,
-      y: 50,
-      vx: (Math.random() - 0.5) * 28,
-      vy: (Math.random() - 0.8) * 24,
-      size: Math.random() * 8 + 6,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      shape: shapes[Math.floor(Math.random() * shapes.length)],
-      rotate: Math.random() * 360,
-      rotateSpeed: (Math.random() - 0.5) * 25,
-      delay: Math.random() * 0.1,
-      duration: Math.random() * 1.5 + 1.8,
-    }));
-
-    setConfettiParticles(newParticles);
-    setShowConfetti(true);
-
-    setTimeout(() => {
-      setShowConfetti(false);
-    }, 3500);
-  }, []);
-
-  // Template Handlers
-  const handleTemplateMessageChange = (val: string | React.ChangeEvent<HTMLTextAreaElement>) => {
-    const messageStr = typeof val === "string" ? val : (val?.target?.value ?? "");
-    setTemplateForm((prev) => ({ ...prev, message: messageStr }));
-  };
-
   const handleSuggestCategory = () => {
     setIsSuggestingCategory(true);
     setTimeout(() => {
@@ -371,10 +344,10 @@ export default function App() {
       return;
     }
 
-    if (editingTemplateId) {
+    if (templateForm.id) {
       setTemplates((prev) =>
         prev.map((t) =>
-          t.id === editingTemplateId
+          t.id === templateForm.id
             ? {
                 ...t,
                 name: templateForm.name,
@@ -400,7 +373,6 @@ export default function App() {
     }
 
     setShowTemplateModal(false);
-    setEditingTemplateId(null);
     setTemplateForm({ name: "", category: "General", subject: "", message: "" });
   };
 
@@ -430,9 +402,9 @@ export default function App() {
           jarvisBg={jarvisBg}
         />
       ) : (
-        <div className="min-h-screen min-h-[100dvh] bg-slate-950 flex items-center justify-center font-sans text-slate-800 overflow-hidden relative select-none">
+        <div className="h-screen h-[100dvh] w-full bg-slate-950 flex items-center justify-center font-sans text-slate-800 overflow-hidden relative select-none">
           {/* Mobile Shell Frame */}
-          <div className="w-full max-w-[430px] h-[100dvh] sm:h-[92vh] sm:max-h-[890px] mx-auto bg-[#e8edf5] rounded-none sm:rounded-[40px] border-0 sm:border-[8px] border-slate-800/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden hardware-accelerated shrink-0">
+          <div className="w-full max-w-full sm:max-w-[430px] h-full h-[100dvh] sm:h-[92vh] sm:max-h-[890px] mx-auto bg-[#e8edf5] rounded-none sm:rounded-[40px] border-0 sm:border-[8px] border-slate-800/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden hardware-accelerated shrink-0">
             
             {/* Dynamic Island Notch (Desktop Preview Only) */}
             <div className="hidden sm:flex items-center justify-center h-5 bg-[#003b6d] shrink-0 z-40 relative">
@@ -490,7 +462,7 @@ export default function App() {
             )}
 
             {/* --- HEADER --- */}
-            <header className="h-[calc(56px+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-3 flex items-center justify-between gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-500 ease-in-out backdrop-blur-md overflow-hidden">
+            <header className="h-14 bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-3 flex items-center justify-between gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-300 ease-in-out backdrop-blur-md overflow-hidden">
               {/* Left Area (Key Button, Logout & Back Button) */}
               <div className="flex items-center gap-1 shrink-0 z-10">
                 <button 
@@ -609,7 +581,6 @@ export default function App() {
                 <TemplatesTab 
                   templates={templates}
                   setActiveTab={setActiveTab}
-                  setEditingTemplateId={setEditingTemplateId}
                   setTemplateForm={setTemplateForm}
                   setShowTemplateModal={setShowTemplateModal}
                   setTemplateToDelete={setTemplateToDelete}
@@ -647,7 +618,6 @@ export default function App() {
             {/* --- GLOBAL APP MODALS CONTROLLERS --- */}
             <TemplateFormModal 
               showTemplateModal={showTemplateModal}
-              editingTemplateId={editingTemplateId}
               templateForm={templateForm}
               setTemplateForm={setTemplateForm}
               isSuggestingCategory={isSuggestingCategory}
@@ -655,10 +625,8 @@ export default function App() {
               handleSaveTemplateSubmit={handleSaveTemplateSubmit}
               onClose={() => {
                 setShowTemplateModal(false);
-                setEditingTemplateId(null);
                 setTemplateForm({ name: "", category: "General", subject: "", message: "" });
               }}
-              handleTemplateMessageChange={handleTemplateMessageChange}
             />
 
             <TemplatePreviewModal 
@@ -696,6 +664,9 @@ export default function App() {
               autoLockTimeout={autoLockTimeout}
               setAutoLockTimeout={setAutoLockTimeout}
             />
+
+            {/* --- PWA INSTALL PROMPT & OFFLINE STATUS --- */}
+            <PwaInstallPrompt />
 
             {/* --- BANK-GRADE TOAST NOTIFICATION STACK --- */}
             <NotificationToastStack 
