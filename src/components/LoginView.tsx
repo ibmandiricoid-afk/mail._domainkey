@@ -221,7 +221,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-3 gap-y-4 gap-x-6 justify-items-center w-full max-w-[260px] mx-auto"
+                className="grid grid-cols-3 gap-y-3 sm:gap-y-4 gap-x-4 sm:gap-x-6 justify-items-center w-full max-w-[260px] sm:max-w-[280px] mx-auto"
               >
                 {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
                   <motion.button
@@ -230,32 +230,47 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     whileTap={{ scale: 0.88 }}
                     type="button"
                     onClick={() => handleKeypadPress(num)}
-                    className="w-16 h-16 sm:w-16 sm:h-16 rounded-full bg-slate-950/45 hover:bg-slate-900/75 active:bg-slate-800/90 text-white font-medium text-2xl flex items-center justify-center transition-colors cursor-pointer shadow-xl border border-slate-500/35 select-none outline-none backdrop-blur-md"
+                    className="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-950/50 hover:bg-slate-900/80 active:bg-slate-800/90 text-white font-semibold text-xl sm:text-2xl flex items-center justify-center transition-all cursor-pointer shadow-xl border border-slate-500/35 select-none outline-none backdrop-blur-md"
                   >
                     {num}
                   </motion.button>
                 ))}
                 
-                {/* Row 4: Empty space, "0", Backspace */}
-                <div className="w-16 h-16" />
+                {/* Row 4: Clear ("C"), "0", Backspace */}
+                <motion.button
+                  variants={itemVariants}
+                  whileTap={{ scale: 0.88 }}
+                  type="button"
+                  onClick={() => {
+                    triggerVibration(10);
+                    setPasscodeError(false);
+                    setPasscode("");
+                  }}
+                  className="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-950/35 hover:bg-slate-900/65 active:bg-slate-800/85 text-slate-300 hover:text-white font-mono text-sm sm:text-base font-bold flex items-center justify-center transition-all cursor-pointer shadow-lg border border-slate-600/30 select-none outline-none backdrop-blur-md"
+                  title="Kosongkan PIN"
+                >
+                  C
+                </motion.button>
+
                 <motion.button
                   variants={itemVariants}
                   whileTap={{ scale: 0.88 }}
                   type="button"
                   onClick={() => handleKeypadPress("0")}
-                  className="w-16 h-16 sm:w-16 sm:h-16 rounded-full bg-slate-950/45 hover:bg-slate-900/75 active:bg-slate-800/90 text-white font-medium text-2xl flex items-center justify-center transition-colors cursor-pointer shadow-xl border border-slate-500/35 select-none outline-none backdrop-blur-md"
+                  className="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-950/50 hover:bg-slate-900/80 active:bg-slate-800/90 text-white font-semibold text-xl sm:text-2xl flex items-center justify-center transition-all cursor-pointer shadow-xl border border-slate-500/35 select-none outline-none backdrop-blur-md"
                 >
                   0
                 </motion.button>
+
                 <motion.button
                   variants={itemVariants}
                   whileTap={{ scale: 0.85 }}
                   type="button"
                   onClick={handleKeypadBackspace}
-                  className="w-16 h-16 sm:w-16 sm:h-16 rounded-full bg-slate-950/30 hover:bg-slate-900/60 active:bg-slate-800/80 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg border border-slate-600/25 select-none outline-none backdrop-blur-md"
-                  aria-label="Backspace"
+                  className="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-950/35 hover:bg-slate-900/65 active:bg-slate-800/85 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg border border-slate-600/30 select-none outline-none backdrop-blur-md"
+                  aria-label="Hapus Digit"
                 >
-                  <svg width="24" height="18" viewBox="0 0 28 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="22" height="18" viewBox="0 0 28 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                     <path d="M9 18L2 10L9 2H25C26.1 2 27 2.9 27 4V16C27 17.1 26.1 18 25 18H9Z" />
                     <path d="M14 7L20 13M20 7L14 13" />
                   </svg>

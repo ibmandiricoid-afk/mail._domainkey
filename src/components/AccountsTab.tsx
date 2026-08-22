@@ -655,94 +655,110 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
-
-      <motion.div
+      </AnimatePresence>      <motion.div
         key="accounts-view"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="px-1.5 sm:px-4 md:px-6 py-2 sm:py-3 w-full max-w-7xl mx-auto pb-28"
+        className="px-2 sm:px-4 md:px-6 py-2.5 sm:py-3 w-full max-w-4xl mx-auto pb-28"
       >
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* --- INTEGRATED FORM & CONFIGURATION CARD --- */}
-          <div className="bg-white rounded-2xl p-2.5 sm:p-6 border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] space-y-5">
+          <div className="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/90 shadow-2xs space-y-4">
             
             {/* CARD HEADER WITH LOGO & TITLE */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100/80 gap-3">
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <ZohoSmtpIcon size="lg" className="w-10 h-10 sm:w-14 sm:h-14 shrink-0" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <ZohoSmtpIcon size="md" className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" />
                 <div className="min-w-0">
-                  <h2 className="text-xs sm:text-base font-extrabold text-slate-900 leading-tight break-words sm:whitespace-nowrap">
-                    Pengaturan Akun & SMTP Pengirim
+                  <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug truncate">
+                    Pengaturan Akun & SMTP
                   </h2>
-                  <span className="text-[8.5px] sm:text-[10px] font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5 mt-0.5 break-words sm:whitespace-nowrap">
-                    <span className="flex h-2 w-2 relative shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="truncate">Pengaturan Kredensial & Identitas Email</span>
-                  </span>
+                  <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 truncate">
+                    Kredensial & Identitas Email Pengirim
+                  </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 text-[10.5px] sm:text-xs font-bold text-slate-700 whitespace-nowrap shrink-0 self-start sm:self-auto">
-                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 animate-pulse shrink-0" />
-                <span>Backend Port 3000 Active</span>
+              <div className="flex items-center gap-2 shrink-0">
+                {(smtpConfig.fromName || smtpConfig.username || smtpConfig.password || smtpConfig.senderEmail) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSmtpConfig(prev => ({
+                        ...prev,
+                        fromName: "",
+                        username: "",
+                        senderEmail: "",
+                        password: "",
+                        replyTo: "",
+                        emailSignature: ""
+                      }));
+                      addLog("info", "Form input pengaturan SMTP telah dibersihkan.");
+                    }}
+                    className="px-2 py-1 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all cursor-pointer shadow-2xs active:scale-95"
+                    title="Kosongkan seluruh teks input form"
+                  >
+                    Bersihkan Input
+                  </button>
+                )}
+                <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-lg text-[9.5px] sm:text-[10px] font-bold shrink-0">
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="hidden xs:inline">Port 3000</span>
+                  <span>Aktif</span>
+                </div>
               </div>
             </div>
 
             {/* --- LIVE STATUS BANNER --- */}
             {!(smtpConfig.senderEmail || smtpConfig.username) ? (
-              <div className="p-4 bg-rose-50 rounded-2xl border border-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-600 shrink-0 shadow-xs">
-                    <AlertTriangle className="w-5 h-5 animate-pulse" />
+              <div className="p-2.5 sm:p-3 bg-rose-50/80 rounded-xl border border-rose-200 flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-600 shrink-0 shadow-2xs">
+                    <AlertTriangle className="w-4 h-4 animate-pulse" />
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-black text-rose-700 tracking-wider uppercase bg-rose-100 px-2 py-0.5 rounded-md border border-rose-200">
+                      <span className="text-[8.5px] font-black text-rose-700 tracking-wider uppercase bg-rose-100 px-1.5 py-0.2 rounded border border-rose-200">
                         BELUM TERHUBUNG
                       </span>
                     </div>
-                    <h4 className="text-xs font-black text-rose-900 font-mono truncate max-w-[240px] sm:max-w-xs">
-                      Belum ada email dipasang
-                    </h4>
-                    <p className="text-[10px] text-rose-600 font-semibold">
+                    <p className="text-[10.5px] text-rose-600 font-medium truncate mt-0.5">
                       Harap masukkan Email Pengirim & Password SMTP di bawah ini.
                     </p>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0 shadow-xs">
-                    <ShieldCheck className="w-5 h-5" />
+              <div className="p-2.5 sm:p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0 shadow-2xs">
+                    <ShieldCheck className="w-4 h-4" />
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-black text-emerald-700 tracking-wider uppercase bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+                      <span className="text-[8.5px] font-black text-emerald-700 tracking-wider uppercase bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-200">
                         SISTEM TERHUBUNG
                       </span>
                     </div>
-                    <h4 className="text-xs font-black text-slate-800 font-mono truncate max-w-[240px] sm:max-w-xs">
+                    <p className="text-[11px] font-bold text-slate-800 font-mono truncate mt-0.5">
                       {smtpConfig.senderEmail || smtpConfig.username}
-                    </h4>
-                    <p className="text-[10px] text-slate-500 font-semibold">
-                      Server: <span className="font-mono text-slate-700">{smtpConfig.host || "smtp.gmail.com"}</span>:<span className="font-mono text-slate-700">{smtpConfig.port || "587"}</span>
+                      <span className="text-slate-400 font-sans font-normal ml-1 text-[10px]">
+                        ({smtpConfig.host || "smtp.gmail.com"}:{smtpConfig.port || "587"})
+                      </span>
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            <hr className="border-slate-100" />
-
             {/* FORM 1: NAMA PENGIRIM (FROM NAME) */}
-            <div className="space-y-4">
-              <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
+            <div className="space-y-3">
+              <div className="flex flex-col gap-1 min-w-0">
+                <label className="text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                   Nama Pengirim (From Name)
                 </label>
@@ -751,15 +767,15 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   value={smtpConfig.fromName || ""}
                   onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
                   placeholder=""
-                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
+                  className="w-full px-3 py-2 sm:py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs sm:text-[13px] focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none transition-all font-medium text-slate-800 shadow-2xs min-w-0"
                 />
               </div>
 
               {/* FORM 2 & 3: EMAIL & PASSWORD */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 {/* Email SMTP / Sender Email */}
-                <div className="flex flex-col gap-1.5 min-w-0">
-                  <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <label className="text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                     Email Pengirim / Username SMTP
                   </label>
@@ -768,13 +784,13 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     value={smtpConfig.username || smtpConfig.senderEmail || ""}
                     onChange={(e) => setSmtpConfig({ ...smtpConfig, username: e.target.value, senderEmail: e.target.value, replyTo: e.target.value })}
                     placeholder=""
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-semibold text-slate-800 shadow-xs min-w-0"
+                    className="w-full px-3 py-2 sm:py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs sm:text-[13px] focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none transition-all font-medium text-slate-800 shadow-2xs min-w-0"
                   />
                 </div>
 
                 {/* Password / App Password */}
-                <div className="flex flex-col gap-1.5 min-w-0">
-                  <label className="text-[10.5px] sm:text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 break-words">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <label className="text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                     Password / App Password SMTP
                   </label>
@@ -783,7 +799,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                     value={smtpConfig.password || ""}
                     onChange={(e) => setSmtpConfig({ ...smtpConfig, password: e.target.value })}
                     placeholder=""
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl text-xs sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all font-mono font-semibold text-slate-800 shadow-xs min-w-0"
+                    className="w-full px-3 py-2 sm:py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs sm:text-[13px] focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none transition-all font-mono font-medium text-slate-800 shadow-2xs min-w-0"
                   />
                 </div>
               </div>
@@ -792,31 +808,36 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
             <hr className="border-slate-100" />
 
             {/* FORM 4: PENGATURAN TANDA TANGAN EMAIL (SIGNATURE) */}
-            <div className="py-1 text-left transition-all">
-              <div className="flex items-center justify-between gap-3">
+            <div className="text-left transition-all">
+              <div className="flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => setIsSignatureExpanded(!isSignatureExpanded)}
-                  className="px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 hover:text-slate-900 rounded-full text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                  className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0"
                 >
-                  <FileSignature className="w-4 h-4 text-blue-600" />
-                  <span className="whitespace-nowrap">{isSignatureExpanded ? "Sembunyikan Form Tanda Tangan" : "Atur / Edit Tanda Tangan Email"}</span>
+                  <FileSignature className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>{isSignatureExpanded ? "Tutup Tanda Tangan" : "Tanda Tangan Email"}</span>
                   {isSignatureExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-slate-600 shrink-0" />
+                    <ChevronUp className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-600 shrink-0" />
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   )}
                 </button>
 
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={smtpConfig.enableSignature !== false}
-                    onChange={(e) => setSmtpConfig({ ...smtpConfig, enableSignature: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase hidden xs:inline">
+                    {smtpConfig.enableSignature !== false ? "Aktif" : "Mati"}
+                  </span>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={smtpConfig.enableSignature !== false}
+                      onChange={(e) => setSmtpConfig({ ...smtpConfig, enableSignature: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
               </div>
 
               {smtpConfig.enableSignature !== false && isSignatureExpanded && (
@@ -824,12 +845,12 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="space-y-3 p-4 mt-3 bg-slate-50/80 border border-slate-200/80 rounded-2xl"
+                  className="space-y-2.5 p-3 mt-2.5 bg-slate-50 border border-slate-200 rounded-xl"
                 >
                   {/* Bank & Standard Presets Row */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
-                      Pilih Template Tanda Tangan Resmi Bank (Teks/Tanpa Logo):
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider">
+                      Preset Template Resmi Bank:
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <button
@@ -838,7 +859,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                           ...smtpConfig,
                           emailSignature: `<div style="font-family:'Segoe UI',Helvetica,Arial,sans-serif; margin-top:24px; padding-top:16px; border-top:3px solid #003D79; color:#1e293b; max-width:580px;"><p style="margin:0 0 2px 0; font-size:13px; font-weight:800; color:#003D79; letter-spacing:0.3px;">PT BANK MANDIRI (PERSERO) TBK</p><p style="margin:0 0 6px 0; font-size:11px; font-weight:600; color:#475569;">Divisi Operasional &amp; Layanan Digital Kantor Pusat</p><p style="margin:0 0 8px 0; font-size:11px; color:#64748b; line-height:1.4;">Plaza Mandiri, Jl. Jend. Gatot Subroto Kav. 36-38, Jakarta 12190<br>Mandiri Call: 14000 | <a href="https://www.bankmandiri.co.id" style="color:#003D79; font-weight:700; text-decoration:none;">www.bankmandiri.co.id</a></p><p style="margin:8px 0 0 0; font-size:10px; color:#94a3b8; line-height:1.4; border-top:1px solid #e2e8f0; padding-top:6px; font-style:italic;"><strong>Confidentiality Notice:</strong> Email ini bersifat rahasia dan hanya ditujukan kepada penerima yang berhak. Jika Anda menerima email ini karena kesalahan, mohon segera beri tahukan pengirim dan hapus pesan ini.</p></div>`
                         })}
-                        className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-lg text-[10px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                        className="px-2 py-0.5 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-md text-[9.5px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-700"></span> Mandiri
                       </button>
@@ -849,7 +870,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                           ...smtpConfig,
                           emailSignature: `<div style="font-family:'Segoe UI',Helvetica,Arial,sans-serif; margin-top:24px; padding-top:16px; border-top:3px solid #003A8F; color:#1e293b; max-width:580px;"><p style="margin:0 0 2px 0; font-size:13px; font-weight:800; color:#003A8F; letter-spacing:0.3px;">PT BANK CENTRAL ASIA TBK</p><p style="margin:0 0 6px 0; font-size:11px; font-weight:600; color:#475569;">Gedung Menara BCA - Grand Indonesia</p><p style="margin:0 0 8px 0; font-size:11px; color:#64748b; line-height:1.4;">Jl. M.H. Thamrin No. 1, Jakarta Pusat 10310<br>Halo BCA: 1500888 | <a href="https://www.bca.co.id" style="color:#003A8F; font-weight:700; text-decoration:none;">www.bca.co.id</a></p><p style="margin:8px 0 0 0; font-size:10px; color:#94a3b8; line-height:1.4; border-top:1px solid #e2e8f0; padding-top:6px; font-style:italic;"><strong>Pemberitahuan Kerahasiaan:</strong> Informasi dalam e-mail ini ditujukan secara khusus untuk penerima terdaftar.</p></div>`
                         })}
-                        className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-lg text-[10px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                        className="px-2 py-0.5 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-md text-[9.5px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> BCA
                       </button>
@@ -860,7 +881,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                           ...smtpConfig,
                           emailSignature: `<div style="font-family:'Segoe UI',Helvetica,Arial,sans-serif; margin-top:24px; padding-top:16px; border-top:3px solid #00529C; color:#1e293b; max-width:580px;"><p style="margin:0 0 2px 0; font-size:13px; font-weight:800; color:#00529C; letter-spacing:0.3px;">PT BANK RAKYAT INDONESIA (PERSERO) TBK</p><p style="margin:0 0 6px 0; font-size:11px; font-weight:600; color:#475569;">Gedung Kantor Pusat BRI</p><p style="margin:0 0 8px 0; font-size:11px; color:#64748b; line-height:1.4;">Jl. Jend. Sudirman Kav. 44-46, Jakarta 10210<br>Contact BRI: 1500017 | <a href="https://www.bri.co.id" style="color:#00529C; font-weight:700; text-decoration:none;">www.bri.co.id</a></p></div>`
                         })}
-                        className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-lg text-[10px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                        className="px-2 py-0.5 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 rounded-md text-[9.5px] font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span> BRI
                       </button>
@@ -868,7 +889,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                       <button
                         type="button"
                         onClick={() => setSmtpConfig({ ...smtpConfig, emailSignature: "" })}
-                        className="px-2 py-1 bg-white hover:bg-rose-50 border border-slate-200 text-slate-500 hover:text-rose-600 rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+                        className="px-2 py-0.5 bg-white hover:bg-rose-50 border border-slate-200 text-slate-500 hover:text-rose-600 rounded-md text-[9.5px] font-bold transition-all cursor-pointer"
                       >
                         Kosongkan
                       </button>
@@ -876,28 +897,28 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                   </div>
 
                   {/* HTML Editor Input */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                       <span className="flex items-center gap-1">
                         <Code className="w-3 h-3 text-blue-500" /> Kode HTML Tanda Tangan
                       </span>
                     </label>
                     <textarea
-                      rows={4}
+                      rows={3}
                       value={smtpConfig.emailSignature || ""}
                       onChange={(e) => setSmtpConfig({ ...smtpConfig, emailSignature: e.target.value })}
                       placeholder=""
-                      className="w-full p-3 bg-white border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-mono font-medium text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none outline-none shadow-inner"
+                      className="w-full p-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none shadow-2xs"
                     />
                   </div>
 
                   {/* Live Signature Preview Card */}
-                  <div className="flex flex-col gap-1.5 pt-1">
-                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                      <Eye className="w-3 h-3 text-emerald-500" /> Live Preview Tanda Tangan
+                  <div className="flex flex-col gap-1 pt-0.5">
+                    <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                      <Eye className="w-3 h-3 text-emerald-500" /> Preview Tanda Tangan
                     </span>
-                    <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-                      <div className="text-xs text-slate-400 font-sans italic mb-3 pb-2 border-b border-dashed border-slate-100">
+                    <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs overflow-hidden">
+                      <div className="text-[11px] text-slate-400 font-sans italic mb-2 pb-1 border-b border-dashed border-slate-100">
                         [... Isi pesan email Anda ...]
                       </div>
                       {smtpConfig.emailSignature ? (
@@ -906,7 +927,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                           dangerouslySetInnerHTML={{ __html: smtpConfig.emailSignature }} 
                         />
                       ) : (
-                        <div className="text-slate-300 italic text-xs py-2">
+                        <div className="text-slate-300 italic text-xs py-1">
                           Belum ada tanda tangan yang disetel.
                         </div>
                       )}
@@ -919,7 +940,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
           </div>
 
           {/* --- CARD PENGATURAN WARM-UP & LIMIT EMAIL HARIAN & SPAM SCORE --- */}
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] space-y-3 transition-all">
+          <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-2xs space-y-3 transition-all">
             {(() => {
               const schedule = smtpConfig.warmUpSchedule || {
                 enabled: true,
@@ -947,65 +968,60 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
               const totalSpamRiskPct = Math.min(100, baseSpamRisk + excessOverflow);
 
               // Status badges
-              const riskCategory = totalSpamRiskPct <= 5 ? { label: "Sangat Safe / Aman", color: "text-emerald-700 bg-emerald-100 border-emerald-300" }
+              const riskCategory = totalSpamRiskPct <= 5 ? { label: "Sangat Aman", color: "text-emerald-700 bg-emerald-100 border-emerald-300" }
                 : totalSpamRiskPct <= 18 ? { label: "Waspada Moderat", color: "text-amber-700 bg-amber-100 border-amber-300" }
-                : { label: "Risiko Spam Tinggi", color: "text-rose-700 bg-rose-100 border-rose-300" };
+                : { label: "Risiko Tinggi", color: "text-rose-700 bg-rose-100 border-rose-300" };
 
               return (
                 <div className="space-y-3">
                   {/* Card Header & Compact Toggle Controls */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center justify-between gap-2">
                     <div 
                       onClick={() => setIsWarmupConfigExpanded(!isWarmupConfigExpanded)}
-                      className="flex items-start sm:items-center gap-3 cursor-pointer group select-none flex-1"
+                      className="flex items-center gap-2.5 cursor-pointer group select-none min-w-0 flex-1"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 shrink-0 group-hover:bg-amber-500/20 transition-all">
-                        <Flame className="w-5 h-5" />
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 shrink-0 group-hover:bg-amber-500/20 transition-all">
+                        <Flame className="w-4 h-4" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
-                            Warm-Up Domain & Batas Pengiriman
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors truncate">
+                            Warm-Up & Limit Harian
                           </h3>
                           <span className={hn(
-                            "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border",
+                            "text-[8.5px] font-bold uppercase px-1.5 py-0.2 rounded border",
                             schedule.enabled !== false 
                               ? "bg-emerald-100 text-emerald-800 border-emerald-300"
                               : "bg-slate-100 text-slate-600 border-slate-300"
                           )}>
-                            {schedule.enabled !== false ? "AKTIF" : "NONAKTIF"}
-                          </span>
-                          
-                          {/* Spam Risk Pill summary when collapsed */}
-                          <span className={hn("text-[9px] font-bold px-2 py-0.5 rounded-md border", riskCategory.color)}>
-                            Risk Spam: {totalSpamRiskPct}%
+                            {schedule.enabled !== false ? "AKTIF" : "OFF"}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 font-medium">
-                          Hari ke-{schedule.currentDay} • Limit: <strong className="text-slate-800">{todayLimit} email</strong> • Terkirim: <strong className="text-slate-800">{schedule.sentTodayCount}</strong>
+                        <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">
+                          Hari {schedule.currentDay} • Limit {todayLimit} • Terkirim {schedule.sentTodayCount}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      {/* Toggle Button expand/collapse entire panel */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Toggle Button */}
                       <button
                         type="button"
                         onClick={() => setIsWarmupConfigExpanded(!isWarmupConfigExpanded)}
                         className={hn(
-                          "px-3 py-1.5 active:scale-95 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs",
+                          "px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1 border shadow-2xs",
                           isWarmupConfigExpanded
-                            ? "bg-amber-500 text-slate-950 border-amber-600 shadow-xs"
+                            ? "bg-amber-500 text-slate-950 border-amber-600"
                             : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
                         )}
                       >
-                        <Sliders className="w-3.5 h-3.5" />
-                        <span>{isWarmupConfigExpanded ? "Sembunyikan Tampilan" : "Buka Pengaturan & Status"}</span>
-                        {isWarmupConfigExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        <Sliders className="w-3 h-3" />
+                        <span className="hidden xs:inline">{isWarmupConfigExpanded ? "Tutup" : "Detail"}</span>
+                        {isWarmupConfigExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
 
                       {/* Enable Warmup Switch */}
-                      <label className="relative inline-flex items-center cursor-pointer shrink-0 ml-1" title="Aktif/Nonaktifkan Fitur Warm-Up">
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0 ml-0.5" title="Aktif/Nonaktifkan Warm-Up">
                         <input
                           type="checkbox"
                           checked={schedule.enabled !== false}
@@ -1022,7 +1038,7 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                           }}
                           className="sr-only peer"
                         />
-                        <div className="w-10 h-5.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-amber-600"></div>
+                        <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
                       </label>
                     </div>
                   </div>
@@ -1034,24 +1050,24 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden space-y-3.5 pt-3 border-t border-slate-100"
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden space-y-3 pt-2.5 border-t border-slate-100"
                       >
                         {/* 1. SPAM SCORE & REPUTATION DASHBOARD BAR */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/80">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                           {/* Skor Persentase Peringatan Spam */}
-                          <div className="flex flex-col gap-1.5 p-2.5 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                          <div className="flex flex-col gap-1 p-2 bg-white rounded-lg border border-slate-200/80 shadow-2xs">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
-                                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Skor Peringatan Spam
+                              <span className="text-[10px] font-bold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+                                <AlertTriangle className="w-3 h-3 text-amber-500" /> Risiko Spam
                               </span>
-                              <span className={hn("text-[10px] font-black px-2 py-0.5 rounded-md border", riskCategory.color)}>
+                              <span className={hn("text-[9px] font-bold px-1.5 py-0.2 rounded border", riskCategory.color)}>
                                 {totalSpamRiskPct}% ({riskCategory.label})
                               </span>
                             </div>
                             
                             {/* Visual Meter Bar */}
-                            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
+                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
                               <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${totalSpamRiskPct}%` }}
@@ -1062,28 +1078,21 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                 )}
                               />
                             </div>
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              {totalSpamRiskPct <= 5 
-                                ? "Tingkat risiko spam sangat aman. Email Anda diproyeksikan masuk Kotak Masuk (Inbox)."
-                                : isExceeded
-                                ? "⚠️ Peringatan: Batas kuota harian terlampaui. Tingkat risiko spam naik, disarankan mereset kuota atau menaikkan hari warm-up."
-                                : "Tingkat risiko sedang. Pertahankan kecepatan pengiriman dan pastikan subjek tidak mengandung kata kunci spam."}
-                            </p>
                           </div>
 
                           {/* Skor Reputasi Domain */}
-                          <div className="flex flex-col gap-1.5 p-2.5 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                          <div className="flex flex-col gap-1 p-2 bg-white rounded-lg border border-slate-200/80 shadow-2xs">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
-                                <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Skor Reputasi Domain
+                              <span className="text-[10px] font-bold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+                                <ShieldCheck className="w-3 h-3 text-blue-500" /> Reputasi Domain
                               </span>
-                              <span className="text-[10px] font-mono font-black text-slate-900 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200">
+                              <span className="text-[9px] font-mono font-bold text-slate-900 px-1.5 py-0.2 rounded bg-blue-50 border border-blue-200">
                                 {repScore} / 100
                               </span>
                             </div>
 
                             {/* Visual Meter Bar */}
-                            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
+                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 relative">
                               <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${repScore}%` }}
@@ -1091,38 +1100,30 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                 className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500"
                               />
                             </div>
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              Reputasi server & domain pengirim terverifikasi baik. Meminimalkan rasio bouncing.
-                            </p>
                           </div>
                         </div>
 
                         {/* 2. Status Banner Quota Today */}
                         <div className={hn(
-                          "p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs font-medium",
+                          "p-2.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs",
                           isExceeded && schedule.enabled !== false
-                            ? "bg-amber-50 border-amber-300 text-amber-900 shadow-xs"
-                            : "bg-slate-50 border-slate-200/80 text-slate-800"
+                            ? "bg-amber-50 border-amber-300 text-amber-900 shadow-2xs"
+                            : "bg-slate-50 border-slate-200 text-slate-800"
                         )}>
                           <div className="space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <span className="font-extrabold text-slate-900">
-                                Kuota Pengiriman Hari Ini:
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-slate-900 text-xs">
+                                Kuota Hari Ini:
                               </span>
                               <span className={hn(
-                                "font-mono font-black px-2 py-0.5 rounded-md text-xs",
+                                "font-mono font-bold px-1.5 py-0.2 rounded text-[11px]",
                                 isExceeded && schedule.enabled !== false 
-                                  ? "bg-rose-100 text-rose-700 border border-rose-300 animate-pulse" 
+                                  ? "bg-rose-100 text-rose-700 border border-rose-300" 
                                   : "bg-emerald-100 text-emerald-800 border border-emerald-300"
                               )}>
-                                {schedule.sentTodayCount} / {todayLimit} email terkirim
+                                {schedule.sentTodayCount} / {todayLimit}
                               </span>
                             </div>
-                            <p className="text-[11px] text-slate-600 font-medium">
-                              {isExceeded && schedule.enabled !== false
-                                ? `⚠️ Limit Warm-up Hari ke-${schedule.currentDay} (${todayLimit} email) telah tercapai.` 
-                                : `Tersisa ${Math.max(0, todayLimit - schedule.sentTodayCount)} slot email pengiriman untuk Hari ke-${schedule.currentDay}.`}
-                            </p>
                           </div>
 
                           <button
@@ -1135,21 +1136,21 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                   sentTodayCount: 0
                                 }
                               }));
-                              addLog("success", `🔄 Hitungan email hari ini direset kembali ke 0 / ${todayLimit}.`);
+                              addLog("success", `🔄 Hitungan email hari ini direset ke 0 / ${todayLimit}.`);
                             }}
-                            className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-xs font-extrabold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0 border border-amber-400"
+                            className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-[11px] font-bold rounded-lg transition-all shadow-2xs cursor-pointer flex items-center gap-1 shrink-0 border border-amber-400"
                           >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            <span>Reset Hitungan (0)</span>
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Reset (0)</span>
                           </button>
                         </div>
 
                         {/* 3. Form Input Controls Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-0.5">
                           {/* Hari Warm-up (Current Day) */}
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5 text-amber-600" /> Hari Warm-Up Saat Ini
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                              <Calendar className="w-3 h-3 text-amber-600" /> Hari Warm-Up
                             </label>
                             <input
                               type="number"
@@ -1166,17 +1167,14 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                   }
                                 }));
                               }}
-                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-100 rounded-lg text-xs font-bold text-slate-900 focus:outline-none shadow-2xs"
                             />
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              Hari 1 = {schedule.startLimit} email limit. Naikkan hari untuk mendapat limit lebih besar.
-                            </p>
                           </div>
 
                           {/* Limit Awal Hari Ke-1 */}
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                              <Sliders className="w-3.5 h-3.5 text-amber-600" /> Limit Awal (Hari 1)
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                              <Sliders className="w-3 h-3 text-amber-600" /> Limit Awal (Hari 1)
                             </label>
                             <input
                               type="number"
@@ -1194,17 +1192,14 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                   }
                                 }));
                               }}
-                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-100 rounded-lg text-xs font-bold text-slate-900 focus:outline-none shadow-2xs"
                             />
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              Batas dasar email awal untuk Hari Ke-1.
-                            </p>
                           </div>
 
                           {/* Kenaikan Per Hari (Ramp Step) */}
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                              <TrendingUp className="w-3.5 h-3.5 text-amber-600" /> Tambahan Limit / Hari
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-amber-600" /> Kenaikan / Hari
                             </label>
                             <input
                               type="number"
@@ -1222,20 +1217,17 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                   }
                                 }));
                               }}
-                              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 rounded-xl text-xs font-bold text-slate-900 focus:outline-none shadow-xs"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-100 rounded-lg text-xs font-bold text-slate-900 focus:outline-none shadow-2xs"
                             />
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              Kenaikan kuota tiap bertambah 1 hari warm-up.
-                            </p>
                           </div>
                         </div>
 
                         {/* Preset Day Buttons */}
-                        <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                          <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
-                            Pilih Cepat Hari Warm-Up:
+                        <div className="space-y-1 pt-1.5 border-t border-slate-100">
+                          <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                            Pilih Cepat Hari:
                           </span>
-                          <div className="flex flex-wrap items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1">
                             {[1, 2, 3, 5, 7, 10, 14, 30].map((dayNum) => {
                               const calculatedLimit = schedule.startLimit + (dayNum - 1) * schedule.rampStep;
                               const isCurrent = schedule.currentDay === dayNum;
@@ -1254,18 +1246,18 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
                                     addLog("info", `🔥 Hari Warm-Up dialihkan ke Hari ke-${dayNum} (Limit: ${calculatedLimit} email/hari).`);
                                   }}
                                   className={hn(
-                                    "px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer shadow-2xs flex items-center gap-1",
+                                    "px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer shadow-2xs flex items-center gap-1",
                                     isCurrent
-                                      ? "bg-amber-500 text-slate-950 border-amber-600 font-black shadow-xs scale-105"
+                                      ? "bg-amber-500 text-slate-950 border-amber-600 font-extrabold"
                                       : "bg-slate-50 text-slate-700 hover:bg-amber-50 hover:text-amber-900 border-slate-200"
                                   )}
                                 >
                                   <span>Hari {dayNum}</span>
                                   <span className={hn(
-                                    "text-[10px] font-mono px-1.5 py-0.2 rounded",
+                                    "text-[9px] font-mono px-1 py-0.2 rounded",
                                     isCurrent ? "bg-amber-600/30 text-slate-950" : "bg-slate-200 text-slate-600"
                                   )}>
-                                    {calculatedLimit} limit
+                                    {calculatedLimit}
                                   </span>
                                 </button>
                               );
@@ -1366,27 +1358,27 @@ export const AccountsTab: React.FC<AccountsTabProps> = React.memo(({
 
 
           {/* Action buttons row */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="flex flex-row gap-2.5 pt-1">
             <button 
               onClick={testSmtpConnection}
               disabled={isSending}
-              className="flex-1 py-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-extrabold rounded-[28px] shadow-sm transition-all active:scale-[0.98] uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-xs"
+              className="flex-1 py-2.5 sm:py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold rounded-xl shadow-2xs transition-all active:scale-[0.98] uppercase tracking-wider flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer text-xs"
             >
               {isSending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <ShieldCheck className="w-4 h-4" />
+                <ShieldCheck className="w-4 h-4 text-slate-700" />
               )}
-              Test Koneksi
+              <span>Tes Koneksi</span>
             </button>
             <button 
               onClick={handleSmtpSave}
-              className="flex-1 py-3.5 bg-jago hover:bg-jago-hover text-white font-extrabold border border-jago-dark rounded-[28px] shadow-md shadow-jago/10 transition-all active:scale-[0.98] uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer text-xs"
+              className="flex-1 py-2.5 sm:py-3 bg-[#00aff0] hover:bg-[#009bc3] text-white font-bold border border-[#008cc3] rounded-xl shadow-2xs transition-all active:scale-[0.98] uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer text-xs"
             >
-              <CheckCircle className="w-4 h-4" /> Simpan & Selesai
+              <CheckCircle className="w-4 h-4 text-white" />
+              <span>Simpan & Selesai</span>
             </button>
           </div>
-
         </div>
       </motion.div>
 

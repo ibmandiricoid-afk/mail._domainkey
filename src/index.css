@@ -270,3 +270,31 @@ aside {
   animation: marquee-scroll 25s linear infinite;
   width: max-content;
 }
+
+/* Text Truncate Helper */
+.text-truncate {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Full Viewport Flex Column & Space-Between Layout Containers */
+.full-screen-flex-container {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 100% !important;
+  height: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+  .mobile-vh-container {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-height: calc(100dvh - 120px) !important;
+  }
+}
+

@@ -60,6 +60,70 @@ const TypewriterText: React.FC<{
   return <>{displayedText}</>;
 };
 
+// Memoized Log Item Component to prevent unnecessary re-renders of the entire list
+interface TerminalLogItemProps {
+  log: LogEntry;
+  index: number;
+  isTyping: boolean;
+  onCharacterTyped: () => void;
+  onTypingComplete: () => void;
+}
+
+const TerminalLogItem = React.memo<TerminalLogItemProps>(({
+  log,
+  index,
+  isTyping,
+  onCharacterTyped,
+  onTypingComplete
+}) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.1 }}
+      className="flex flex-col space-y-1 relative z-10 border-b border-slate-800/40 pb-1.5"
+    >
+      <div className="flex gap-2.5 items-start">
+        <span className="text-slate-500 shrink-0 select-none font-bold">
+          [{log.timestamp}]
+        </span>
+        <div className="flex-1">
+          <span
+            className={hn(
+              "leading-relaxed break-words font-semibold",
+              log.type === "error"
+                ? "text-rose-400 font-bold"
+                : log.type === "success"
+                ? "text-emerald-400 font-bold"
+                : log.type === "warning"
+                ? "text-amber-300 animate-pulse"
+                : "text-sky-300"
+            )}
+          >
+            {isTyping ? (
+              <TypewriterText 
+                text={log.message} 
+                speed={16} 
+                onCharacterTyped={onCharacterTyped}
+                onComplete={onTypingComplete} 
+              />
+            ) : (
+              log.message
+            )}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}, (prev, next) => {
+  return (
+    prev.log.timestamp === next.log.timestamp &&
+    prev.log.message === next.log.message &&
+    prev.log.type === next.log.type &&
+    prev.isTyping === next.isTyping
+  );
+});
+
 interface TerminalTabProps {
   logs: LogEntry[];
   setLogs: React.Dispatch<React.SetStateAction<LogEntry[]>>;
@@ -83,6 +147,9 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
   // Check DNS Records States
   const [showDnsPanel, setShowDnsPanel] = useState(false);
   const [isCheckingDns, setIsCheckingDns] = useState(false);
+
+  // Mutual exclusion: No terminal action can run simultaneously
+  const isAnyActionRunning = isTesting || isSimulatingBurst || isCheckingDns;
   const [customDomainInput, setCustomDomainInput] = useState(() => {
     const email = (smtpConfig?.senderEmail || smtpConfig?.username || "").trim();
     if (email.includes("@")) {
@@ -131,11 +198,15 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
 
   useEffect(() => {
     handleScrollToBottom();
+    const frameId = requestAnimationFrame(() => {
+      handleScrollToBottom();
+    });
+    return () => cancelAnimationFrame(frameId);
   }, [logs.length, typingIndex]);
 
   // Check DNS Records Function
   const handleCheckDnsRecords = async (domainToTest?: string, selectorToTest?: string) => {
-    if (isCheckingDns) return;
+    if (isAnyActionRunning) return;
 
     let target = (domainToTest || customDomainInput || "").trim();
     if (!target) {
@@ -229,7 +300,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
 
   // Handle Warm-up Burst & Domain Audit Test directly in terminal
   const handleSimulateWarmupBurst = async () => {
-    if (isSimulatingBurst) return;
+    if (isAnyActionRunning) return;
 
     const activeEmail = (smtpConfig?.senderEmail || smtpConfig?.username || "").trim();
     if (!activeEmail) {
@@ -348,7 +419,7 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
 
   // Test AI latency in background and print results to terminal console logs
   const handleTestAiLatency = async () => {
-    if (isTesting) return;
+    if (isAnyActionRunning) return;
     setIsTesting(true);
 
     if (addLog) {
@@ -410,40 +481,57 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
     >
       <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] flex flex-col h-full max-h-full min-h-0 flex-1 overflow-hidden w-full max-w-4xl">
         {/* Header Bar */}
-        <div className="p-2.5 sm:p-3 border-b border-slate-200 flex justify-between items-center bg-slate-100/80 gap-2 shrink-0">
-          <div className="flex flex-col min-w-0">
-            <h2 className="text-[10px] font-extrabold text-slate-700 uppercase tracking-widest flex items-center gap-1.5 truncate">
-              RELAY CONSOLE LOGS
+        <div className="p-2 sm:p-3 border-b border-slate-200 flex justify-between items-center bg-slate-100/90 gap-1.5 shrink-0">
+          <div className="flex flex-col min-w-0 pr-1">
+            <h2 className="text-[10px] sm:text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5 truncate">
+              RELAY CONSOLE
             </h2>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" />
-              <span className="text-[9px] text-[#005291] font-bold uppercase tracking-wider truncate">
-                System Active & Streaming Live
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]" />
+              </span>
+              <span className="text-[8.5px] sm:text-[9px] text-[#005291] font-bold uppercase tracking-wider truncate">
+                Streaming Live
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap justify-end">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 justify-end">
             {/* Button: Check DNS Records */}
             <button
               type="button"
+              disabled={isAnyActionRunning && !isCheckingDns}
               onClick={() => {
+                if (isAnyActionRunning && !isCheckingDns) return;
                 const nextState = !showDnsPanel;
                 setShowDnsPanel(nextState);
-                if (nextState && !dnsAuditResult && !isCheckingDns) {
+                if (nextState && !dnsAuditResult && !isCheckingDns && !isAnyActionRunning) {
                   handleCheckDnsRecords();
                 }
               }}
               className={hn(
-                "px-2.5 py-1 rounded-full text-[9.5px] font-extrabold transition-all border flex items-center gap-1 cursor-pointer active:scale-95 shadow-xs shrink-0",
-                showDnsPanel
-                  ? "bg-indigo-50 text-indigo-700 border-indigo-300 ring-2 ring-indigo-200 font-black"
-                  : "bg-indigo-600 text-white border-indigo-700 hover:bg-indigo-700 shadow-sm"
+                "px-2 sm:px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-black transition-all border flex items-center gap-1 shrink-0 shadow-2xs",
+                isAnyActionRunning && !isCheckingDns
+                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50"
+                  : showDnsPanel
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-300 ring-2 ring-indigo-200 cursor-pointer active:scale-95"
+                    : "bg-indigo-600 text-white border-indigo-700 hover:bg-indigo-700 cursor-pointer active:scale-95"
               )}
-              title="Periksa Rekam DNS Domain (SPF, DKIM, DMARC)"
+              title={
+                isCheckingDns
+                  ? "Sedang memindai DNS..."
+                  : isAnyActionRunning
+                    ? "Tunggu proses lain selesai..."
+                    : "Periksa Rekam DNS Domain (SPF, DKIM, DMARC)"
+              }
             >
-              <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-amber-300" />
-              <span className="uppercase tracking-tight">Check DNS Records</span>
+              {isCheckingDns ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-300 shrink-0" />
+              ) : (
+                <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-amber-300" />
+              )}
+              <span className="uppercase tracking-tight hidden xs:inline">{isCheckingDns ? "AUDITING..." : "DNS AUDIT"}</span>
             </button>
 
             {/* Toggle Real-time Chart Panel Button */}
@@ -451,29 +539,36 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               type="button"
               onClick={() => setShowChart((prev) => !prev)}
               className={hn(
-                "px-2 py-1 rounded-full text-[9.5px] font-extrabold transition-all border flex items-center gap-1 cursor-pointer active:scale-95 shadow-xs shrink-0",
+                "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all border cursor-pointer active:scale-95 shadow-2xs shrink-0",
                 showChart
                   ? "bg-emerald-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-200"
-                  : "bg-slate-200 text-slate-700 border-slate-300 hover:bg-slate-300"
+                  : "bg-slate-200/80 text-slate-700 border-slate-300 hover:bg-slate-300"
               )}
-              title="Tampilkan/Sembunyikan Grafik Performa Relay Real-Time"
+              title="Tampilkan/Sembunyikan Grafik Performa Relay"
             >
               <BarChart3 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span className="hidden md:inline uppercase tracking-tight">Grafik</span>
             </button>
 
-            {/* Round Icon Button: Tes Latensi AI */}
+            {/* Button: Tes Latensi AI */}
             <button
               type="button"
               onClick={handleTestAiLatency}
-              disabled={isTesting}
+              disabled={isAnyActionRunning}
               className={hn(
-                "w-7 h-7 rounded-full flex items-center justify-center transition-all border cursor-pointer active:scale-95 shadow-xs shrink-0",
+                "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all border shadow-2xs shrink-0",
                 isTesting
-                  ? "bg-sky-100 text-sky-400 border-sky-200 cursor-not-allowed"
-                  : "bg-sky-50 text-sky-600 border-sky-200 hover:bg-sky-100 hover:border-sky-300"
+                  ? "bg-sky-100 text-sky-600 border-sky-300 ring-2 ring-sky-200 cursor-wait"
+                  : isAnyActionRunning
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50"
+                    : "bg-sky-50 text-sky-600 border-sky-200 hover:bg-sky-100 hover:border-sky-300 cursor-pointer active:scale-95"
               )}
-              title="Tes Latensi AI"
+              title={
+                isTesting
+                  ? "Sedang menguji latensi AI..."
+                  : isAnyActionRunning
+                    ? "Tunggu proses lain selesai..."
+                    : "Tes Latensi AI"
+              }
             >
               {isTesting ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-600" />
@@ -482,18 +577,26 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               )}
             </button>
 
-            {/* Round Icon Button: Tes Warm-up Burst */}
+            {/* Button: Tes Warm-up Burst */}
             <button
               type="button"
               onClick={handleSimulateWarmupBurst}
-              disabled={isSimulatingBurst}
+              disabled={isAnyActionRunning}
               className={hn(
-                "w-7 h-7 rounded-full flex items-center justify-center transition-all border cursor-pointer active:scale-95 shadow-xs shrink-0",
+                "w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all border shadow-2xs shrink-0",
                 isSimulatingBurst
-                  ? "bg-amber-100 text-amber-400 border-amber-200 cursor-not-allowed"
-                  : "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 hover:border-amber-300"
+                  ? "bg-amber-100 text-amber-600 border-amber-300 ring-2 ring-amber-200 cursor-wait"
+                  : isAnyActionRunning
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50"
+                    : "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 hover:border-amber-300 cursor-pointer active:scale-95"
               )}
-              title="Tes Warm-up Burst"
+              title={
+                isSimulatingBurst
+                  ? "Sedang simulasi warm-up burst..."
+                  : isAnyActionRunning
+                    ? "Tunggu proses lain selesai..."
+                    : "Tes Warm-up Burst"
+              }
             >
               {isSimulatingBurst ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" />
@@ -502,15 +605,22 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
               )}
             </button>
 
-            {/* Prominent Red Trash Icon Button: Clear Logs */}
+            {/* Button: Clear Logs */}
             <button
               type="button"
+              disabled={isAnyActionRunning}
               onClick={() => {
+                if (isAnyActionRunning) return;
                 setLogs([]);
                 setTypingIndex(0);
               }}
-              className="p-1.5 sm:px-2.5 sm:py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 hover:border-rose-300 transition-all flex items-center gap-1 text-[9px] font-extrabold cursor-pointer active:scale-95 shrink-0 shadow-xs"
-              title="Hapus / Bersihkan Log Terminal"
+              className={hn(
+                "w-7 h-7 sm:w-8 sm:h-8 rounded-lg border transition-all flex items-center justify-center text-[9px] font-extrabold shrink-0 shadow-2xs",
+                isAnyActionRunning
+                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50"
+                  : "bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 hover:border-rose-300 cursor-pointer active:scale-95"
+              )}
+              title={isAnyActionRunning ? "Tunggu proses lain selesai..." : "Hapus / Bersihkan Log Terminal"}
             >
               <Trash2 className="w-3.5 h-3.5 text-rose-600" />
             </button>
@@ -558,8 +668,8 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
                   <button
                     type="button"
                     onClick={() => handleCheckDnsRecords()}
-                    disabled={isCheckingDns}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-extrabold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer shrink-0"
+                    disabled={isAnyActionRunning}
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-extrabold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
                   >
                     {isCheckingDns ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
@@ -578,15 +688,19 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
                   <button
                     key={dom}
                     type="button"
+                    disabled={isAnyActionRunning}
                     onClick={() => {
+                      if (isAnyActionRunning) return;
                       setCustomDomainInput(dom);
                       handleCheckDnsRecords(dom);
                     }}
                     className={hn(
-                      "px-2 py-0.5 rounded-md font-mono transition-all border cursor-pointer",
-                      customDomainInput === dom
-                        ? "bg-indigo-900/60 text-indigo-200 border-indigo-500 font-bold"
-                        : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+                      "px-2 py-0.5 rounded-md font-mono transition-all border",
+                      isAnyActionRunning
+                        ? "opacity-50 cursor-not-allowed bg-slate-800 text-slate-500 border-slate-700"
+                        : customDomainInput === dom
+                          ? "bg-indigo-900/60 text-indigo-200 border-indigo-500 font-bold cursor-pointer"
+                          : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 cursor-pointer"
                     )}
                   >
                     {dom}
@@ -834,44 +948,14 @@ export const TerminalTab: React.FC<TerminalTabProps> = React.memo(({
             }
 
             return (
-              <motion.div 
-                key={`log-${index}-${log.timestamp}`} 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.1 }}
-                className="flex flex-col space-y-1 relative z-10 border-b border-slate-800/40 pb-1.5"
-              >
-                <div className="flex gap-2.5 items-start">
-                  <span className="text-slate-500 shrink-0 select-none font-bold">
-                    [{log.timestamp}]
-                  </span>
-                  <div className="flex-1">
-                    <span
-                      className={hn(
-                        "leading-relaxed break-words font-semibold",
-                        log.type === "error"
-                          ? "text-rose-400 font-bold"
-                          : log.type === "success"
-                          ? "text-emerald-400 font-bold"
-                          : log.type === "warning"
-                          ? "text-amber-300 animate-pulse"
-                          : "text-sky-300"
-                      )}
-                    >
-                      {index === typingIndex ? (
-                        <TypewriterText 
-                          text={log.message} 
-                          speed={16} 
-                          onCharacterTyped={handleScrollToBottom}
-                          onComplete={() => setTypingIndex((prev) => prev + 1)} 
-                        />
-                      ) : (
-                        log.message
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
+              <TerminalLogItem
+                key={`term-log-${log.timestamp}-${index}-${log.type}`}
+                log={log}
+                index={index}
+                isTyping={index === typingIndex}
+                onCharacterTyped={handleScrollToBottom}
+                onTypingComplete={() => setTypingIndex((prev) => prev + 1)}
+              />
             );
           })}
 

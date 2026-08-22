@@ -181,8 +181,31 @@ export default function App() {
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isSuggestingCategory, setIsSuggestingCategory] = useState(false);
 
-  // --- Logger Helper ---
+  // Set-based timestamp cache for log deduplication
+  const recentLogsCacheRef = React.useRef<Map<string, number>>(new Map());
+
+  // --- Logger Helper with fast Set deduplication within seconds window ---
   const addLog = useCallback((type: LogEntry["type"], message: string) => {
+    if (!message || !message.trim()) return;
+    const cleanMsg = message.trim();
+    const now = Date.now();
+    const key = `${type}:::${cleanMsg}`;
+
+    // Clean expired entries from recent logs cache (older than 4 seconds)
+    const cache = recentLogsCacheRef.current;
+    cache.forEach((timestamp, k) => {
+      if (now - timestamp > 4000) {
+        cache.delete(k);
+      }
+    });
+
+    // If an identical log entry arrived within the last 3.5 seconds, filter it out
+    const lastTimestamp = cache.get(key);
+    if (lastTimestamp && now - lastTimestamp < 3500) {
+      return;
+    }
+    cache.set(key, now);
+
     const newEntry: LogEntry = {
       timestamp: new Date().toLocaleTimeString("id-ID", {
         hour: "2-digit",
@@ -190,9 +213,19 @@ export default function App() {
         second: "2-digit",
       }),
       type,
-      message,
+      message: cleanMsg,
     };
-    setLogs((prev) => [...prev.slice(-99), newEntry]);
+
+    setLogs((prev) => {
+      // Direct consecutive deduplication safeguard
+      if (prev.length > 0) {
+        const last = prev[prev.length - 1];
+        if (last.type === type && last.message === cleanMsg) {
+          return prev;
+        }
+      }
+      return [...prev.slice(-99), newEntry];
+    });
   }, []);
 
   // Check Backend SMTP Health
@@ -462,36 +495,38 @@ export default function App() {
             )}
 
             {/* --- HEADER --- */}
-            <header className="h-14 bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-3 flex items-center justify-between gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-300 ease-in-out backdrop-blur-md overflow-hidden">
+            <header className="h-14 bg-gradient-to-r from-[#003b6d] via-[#005291] to-[#006bb3] border-b border-sky-400/20 px-2 sm:px-3 flex items-center justify-between gap-1.5 sm:gap-2 shrink-0 shadow-lg z-30 relative text-white transition-all duration-300 ease-in-out backdrop-blur-md overflow-hidden">
               {/* Left Area (Key Button, Logout & Back Button) */}
-              <div className="flex items-center gap-1 shrink-0 z-10">
-                <button 
-                  onClick={() => {
-                    setPasscodeChangeError(null);
-                    setPasscodeChangeSuccess(null);
-                    setShowPasscodeModal(true);
-                  }}
-                  className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer border border-white/25 shadow-sm"
-                  title="Ganti PIN Panel"
-                >
-                  <KeyRound className="w-4 h-4 text-white" />
-                </button>
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 z-10">
+                {activeTab !== "send" ? (
+                  <button 
+                    onClick={() => setActiveTab("send")}
+                    className="p-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors shrink-0 cursor-pointer border border-white/30 shadow-xs flex items-center gap-1"
+                    title="Kembali ke Form Kirim"
+                    aria-label="Kembali"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-white" />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => {
+                      setPasscodeChangeError(null);
+                      setPasscodeChangeSuccess(null);
+                      setShowPasscodeModal(true);
+                    }}
+                    className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer border border-white/25 shadow-xs"
+                    title="Ganti PIN Panel"
+                  >
+                    <KeyRound className="w-4 h-4 text-white" />
+                  </button>
+                )}
                 <button 
                   onClick={handleLogout}
-                  className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer border border-white/25 shadow-sm"
+                  className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer border border-white/25 shadow-xs"
                   title="Kunci / Keluar Panel"
                 >
                   <LogOut className="w-4 h-4 text-white" />
                 </button>
-                {activeTab !== "send" && (
-                  <button 
-                    onClick={() => setActiveTab("send")}
-                    className="p-1 hover:bg-white/15 rounded-full transition-colors shrink-0 text-white cursor-pointer"
-                    aria-label="Kembali"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-white" />
-                  </button>
-                )}
               </div>
               
               {/* Centered Logo & Brand Text "JARVIS" */}

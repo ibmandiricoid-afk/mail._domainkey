@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { Sparkles, AlertCircle, Send, FileText, Image, X, Cpu, Copy, Check } from "lucide-react";
+import { Sparkles, AlertCircle, Send, FileText, Image, X, Cpu, Copy, Check, BookmarkPlus } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { EmailTemplate } from "../types";
 import jarvisBg from "../assets/images/jarvis_cool_background_1783882128944.jpg";
 import { hn, getHtmlLinks } from "../lib/utils";
-import { CancelTransactionLinkForm } from "./CancelTransactionLinkForm";
 
 // No-op sound trigger for performance
 const playSciFiSound = (_type?: string) => {};
@@ -380,31 +379,26 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(({
             )}
           </div>
 
-          {/* Form Edit Link Batalkan Transaksi (Dedicated Minimal Form) */}
-          <CancelTransactionLinkForm
-            html={msg.template.html}
-            onUpdateHtml={onTemplateHtmlChange}
-            onSave={(updatedHtml) => {
-              saveAiTemplateToCollection({
-                subject: msg.template.subject,
-                html: updatedHtml || msg.template.html
-              });
-            }}
-          />
-
           <div className="flex gap-1.5 flex-wrap pt-1">
             <button
               type="button"
               onClick={applyAiTemplateToForm}
-              className="flex-1 min-w-[100px] py-2 bg-[#00aff0] hover:bg-[#009bc3] text-white text-[9px] font-bold rounded-lg flex items-center justify-center gap-1 shadow-sm transition-all uppercase tracking-wider border border-[#008cc3] cursor-pointer"
+              className="flex-1 min-w-[110px] py-2 bg-[#00aff0] hover:bg-[#009bc3] text-white text-[10px] font-bold rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-all uppercase tracking-wider border border-[#008cc3] cursor-pointer active:scale-95"
             >
               <Send className="w-3 h-3" /> Gunakan di Form
             </button>
             <button
               type="button"
+              onClick={() => saveAiTemplateToCollection()}
+              className="flex-1 min-w-[110px] py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider border border-slate-200 cursor-pointer active:scale-95"
+            >
+              <BookmarkPlus className="w-3 h-3 text-[#00aff0]" /> Simpan Template
+            </button>
+            <button
+              type="button"
               onClick={handleCopyHtml}
               className={hn(
-                "py-2 px-2.5 text-[9px] font-bold rounded-lg flex items-center justify-center gap-1 transition-all uppercase tracking-wider border cursor-pointer shrink-0",
+                "py-2 px-3 text-[10px] font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider border cursor-pointer shrink-0 active:scale-95",
                 copiedHtml
                   ? "bg-emerald-500 text-white border-emerald-600"
                   : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"

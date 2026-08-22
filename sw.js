@@ -1,4 +1,4 @@
-// Service Worker for J.A.R.V.I.S Email Relay Console PWA
+// Enhanced Service Worker for J.A.R.V.I.S Email Relay Console PWA
 // Provides robust offline caching for Static Assets, Vite Bundles, and LocalStorage Draft Shells
 
 const CACHE_VERSION = "v4";

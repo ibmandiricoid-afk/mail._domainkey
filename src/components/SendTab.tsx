@@ -713,10 +713,11 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="px-1.5 sm:px-4 md:px-6 py-1.5 sm:py-2 w-full max-w-7xl mx-auto flex flex-col h-full pb-2 landscape:py-1"
+        style={{ flex: "1 1 auto", height: "100%" }}
+        className="px-1.5 sm:px-4 md:px-6 py-1.5 sm:py-2 w-full max-w-7xl mx-auto flex flex-col justify-between flex-1 h-full min-h-0 pb-2 landscape:py-1"
       >
-        <div className="flex-1 flex flex-col w-full h-auto min-h-[480px]">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] flex-1 flex flex-col min-h-[460px] overflow-hidden">
+        <div style={{ flex: "1 1 auto", height: "100%" }} className="flex-1 flex flex-col justify-between w-full h-full min-h-0">
+          <div style={{ height: "100%", flex: "1 1 auto" }} className="bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.12)] flex-1 flex flex-col justify-between min-h-0 overflow-hidden h-full">
             
             {/* Floating Scan Header Banner */}
             <div className="px-2.5 sm:px-3.5 py-2 border-b border-slate-200 bg-slate-100/70 flex flex-col gap-1 relative shrink-0 rounded-t-2xl">
@@ -802,13 +803,13 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
             <form 
               id="send-email-form"
               onSubmit={handleSendEmailSubmit} 
-              className="px-1.5 py-2 sm:p-3 flex-1 flex flex-col justify-between min-h-[380px] transition-all duration-300 pb-3 w-full max-w-full mx-auto"
+              className="px-1 sm:px-3 py-2 flex-1 flex flex-col justify-between transition-all duration-300 pb-2 w-full max-w-full mx-auto min-h-0"
             >
               {/* Responsive Container */}
-              <div className="flex-1 flex flex-col gap-2.5 min-h-[360px]">
+              <div className="flex-1 flex flex-col gap-2 min-h-0">
                 
                 {/* Form Fields */}
-                <div className="flex-1 flex flex-col gap-2 min-h-[340px]">
+                <div className="flex-1 flex flex-col gap-2 min-h-0">
                   {/* Banners */}
                   {errorBanner && (
                     <motion.div 
@@ -1207,25 +1208,23 @@ export const SendTab: React.FC<SendTabProps> = React.memo(({
               {/* Static Footer (Mobile Templates Carousel & Progress Bar) */}
               <div className="pt-2 flex flex-col gap-2 shrink-0 border-t border-slate-200 mt-2 transition-all duration-300 relative">
                 {/* Mobile templates carousel */}
-                <div className="flex flex-col gap-2 px-1">
+                <div className="flex flex-col gap-1 px-0.5">
                   {templates.length > 0 && (
                     <div className="flex flex-col gap-1">
-                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                        Gunakan Template Tersimpan
+                      <span className="text-[7.5px] sm:text-[8px] font-black text-slate-400 uppercase tracking-[0.15em] ml-0.5">
+                        Template Tersimpan
                       </span>
-                      <div className="flex gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth">
+                      <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 scroll-smooth">
                         {templates.map((t) => (
                           <button
                             key={t.id}
                             type="button"
                             onClick={() => useTemplateContent(t)}
-                            className="shrink-0 group flex flex-col items-start justify-between p-2.5 bg-slate-50 border border-slate-200/90 rounded-xl hover:bg-slate-100 hover:border-jago transition-all shadow-xs active:scale-95 w-[115px] sm:w-[135px] aspect-[2/1] cursor-pointer"
+                            className="shrink-0 px-3 py-1.5 bg-white border border-slate-200/90 rounded-lg hover:bg-slate-50 hover:border-[#00aff0] transition-all shadow-2xs active:scale-95 flex items-center gap-1.5 cursor-pointer max-w-[180px]"
                           >
-                            <span className="text-[9.5px] sm:text-[10px] font-black text-slate-800 group-hover:text-jago-dark line-clamp-1 w-full text-left leading-tight break-words">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#00aff0] shrink-0" />
+                            <span className="text-[10px] font-bold text-slate-700 truncate text-left">
                               {t.name}
-                            </span>
-                            <span className="text-[7.5px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-tight truncate w-full text-left">
-                              {t.category}
                             </span>
                           </button>
                         ))}
